@@ -1,0 +1,15 @@
+package org.everydaymatters.samhsa.rules;
+
+global org.everydaymatters.samhsa.rules.Responder responder;
+
+rule "phq2.low"
+when
+//    accumulate( $e : Event( tag == "OK" ) over window:length(3),
+//                $events : collectList( $e ) )
+
+    // TODO: determine PHQ threshold
+    assessment : Map( this.get("assessment")=="PHQ2", this.get("score")<5 )
+then
+    // TODO: implement rule-fired api
+    responder.log( "Found matching assessment for profile: "+assessment.get("profile") );
+end

@@ -1,0 +1,28 @@
+{
+    "collection": "facility",
+    "indices":
+        [
+            {
+                "keys":
+                    {
+                        "ref": 1
+                    },
+                "options" :
+                    {
+                        "background": true,
+                        "unique": true,
+                        "dropDups": true
+                    }
+            },
+            {
+                "keys":
+                    {
+                        "loc" : "2dsphere"
+                    },
+                "options" :
+                    {
+                        "background": true
+                    }
+            }
+        ]
+}

@@ -1,0 +1,26 @@
+package org.everydaymatters.samhsa.rules;
+
+import java.util.Date;
+import java.util.Map;
+
+import org.everydaymatters.samhsa.srv.PushNotifier;
+
+global org.everydaymatters.samhsa.rules.Responder responder;
+global java.util.Date now;
+
+rule "profile.inactivity"
+when
+    $profile: Map( this.get("docType")=="profile", ((Date)this.get("created")) before[ 3d ] now  )
+    accumulate( Map( this.get("docType")=="activity", $dt: ((Date)this.get("created")) );
+                $max: max( $dt.getTime() );
+                $max before[ 3d ] now )
+then
+    String profileId = $profile.get( "_id" ).toString();
+    Date inactiveSince = new Date( $max.longValue() );
+    responder.log( "Found profile: "+profileId+" without activity update since "+inactiveSince );
+    responder.getNotifier()
+             .sendNotification( profileId, 
+                                "Don't forget MyLifeMatters!", 
+                                "How are you doing? Please take a moment to update your mood journal.", 
+                                PushNotifier.ACT_MOOD, PushNotifier.REF_NONE );
+end

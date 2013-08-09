@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context antiJARLocking="true" path="/edm-mobile">
+  <Resource auth="Container" factory="com.mongodb.jndi.MongoClientJNDIFactory" 
+            mongoClientURI="mongodb://localhost:27017/samhsa?waitqueuemultiple=1500&amp;w=1&amp;maxpoolsize=40&amp;safe=true" 
+            name="mongodb/samhsa" type="com.mongodb.MongoClient" />
+</Context>

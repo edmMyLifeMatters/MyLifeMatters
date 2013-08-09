@@ -1,0 +1,11 @@
+{
+    "profile": "51eda6d230045740250ba431",
+    "photos":
+        [
+            {
+                "label": "kids",
+                "notes": "We're counting on you!",
+                "media": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e"                
+            }
+        ]
+}

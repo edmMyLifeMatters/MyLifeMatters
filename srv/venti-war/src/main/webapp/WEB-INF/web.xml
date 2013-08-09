@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+   Venti RESTful MongoDB 
+   Copyright (c) 2013 by Netsmart Technologies
+ 
+   Venti RESTful MongoDB is licensed under a
+   Creative Commons Attribution 3.0 Unported License.
+ 
+   You should have received a copy of the license along with this
+   work.  If not, see <http://creativecommons.org/licenses/by/3.0/>.
+
+ -->
+ 
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    <display-name>venti-war</display-name>
+    
+    <!--
+    <filter>
+        <filter-class>org.everydaymatters.venti.VentiSecurityFilter</filter-class>
+        <filter-name>SecurityFilter</filter-name>
+        <init-param>
+            <param-name>venti-secure</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+   
+    <filter-mapping>
+        <filter-name>SecurityFilter</filter-name>
+        <url-pattern>/rs/*</url-pattern>
+    </filter-mapping>
+    -->
+    
+    <servlet>
+        <servlet-class>org.everydaymatters.venti.VentiVersionServlet</servlet-class>
+        <servlet-name>VentiVersion</servlet-name>
+    </servlet>
+    <servlet>
+        <servlet-class>org.everydaymatters.venti.VentiServlet</servlet-class>
+        <servlet-name>Venti</servlet-name>
+        <init-param>
+            <param-name>venti-secure</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>mongo-id-style</param-name>
+            <param-value>id</param-value>
+        </init-param>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>VentiVersion</servlet-name>
+        <url-pattern>/rs/version</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Venti</servlet-name>
+        <url-pattern>/rs/crud/*</url-pattern>
+    </servlet-mapping>
+    
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+    
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+    
+    <resource-ref>
+        <res-type>com.mongodb.MongoClient</res-type>
+        <res-ref-name>mongodb/venti</res-ref-name>
+    </resource-ref>
+    
+</web-app>

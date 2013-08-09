@@ -1,0 +1,71 @@
+{
+    "collection": "activity",
+    "indices":
+        [
+            {
+                "keys":
+                    {
+                        "profile": 1
+                    },
+                "options" :
+                    {
+                        "background": true
+                    }
+            },
+            {
+                "keys":
+                    {
+                        "created": -1
+                    },
+                "options" :
+                    {
+                        "background": true
+                    }
+            },
+            {
+                "keys":
+                    {
+                        "profile": 1,
+                        "created": -1
+                    },
+                "options" :
+                    {
+                        "background": true
+                    }
+            },
+            {
+                "keys":
+                    {
+                        "mood.level": -1
+                    },
+                "options" :
+                    {
+                        "background": true,
+                        "sparse": true
+                    }
+            },            
+            {
+                "keys":
+                    {
+                        "source": 1
+                    },
+                "options" :
+                    {
+                        "background": true,
+                        "sparse": true
+                    }
+            },
+            {
+                "keys":
+                    {
+                        "profile": 1,
+                        "source": 1
+                    },
+                "options" :
+                    {
+                        "background": true,
+                        "sparse": true
+                    }
+            }                       
+        ]
+}

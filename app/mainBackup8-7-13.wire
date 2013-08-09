@@ -1,0 +1,2882 @@
+<wire>
+  <datasources>
+		<datasource name="dropdowns" source="" query="//entry" providertype="xml" /> 
+
+        <datasource name="warnings" source="" query="/warnings" providertype="json" />
+        <datasource name="inspiration" source="" query="/inspiration" providertype="json" />
+        <datasource name="environment" source="" query="/environment" providertype="json" />
+        <datasource name="coping" source="" query="/techniques" providertype="json" />
+        
+		<datasource name="write-warning" source="sql://warning" query="CREATE TABLE IF NOT EXISTS WARNING (ID INTEGER PRIMARY KEY AUTOINCREMENT, LABEL TEXT, TYPE TEXT, NOTES TEXT);" providertype="sql" />
+		<datasource name="saved-warning" source="sql://warning" query="SELECT * FROM WARNING ORDER BY ID DESC;" providertype="sql" />
+
+		<datasource name="write-inspiration" source="sql://inspiration" query="CREATE TABLE IF NOT EXISTS INSPIRATION (ID INTEGER PRIMARY KEY AUTOINCREMENT, LABEL TEXT, TYPE TEXT, NOTES TEXT);" providertype="sql" />
+		<datasource name="saved-inspiration" source="sql://inspiration" query="SELECT * FROM INSPIRATION ORDER BY ID DESC;" providertype="sql" />
+
+		<datasource name="write-environment" source="sql://environment" query="CREATE TABLE IF NOT EXISTS ENVIRONMENT (ID INTEGER PRIMARY KEY AUTOINCREMENT, LABEL TEXT);" providertype="sql" />
+		<datasource name="saved-environment" source="sql://environment" query="SELECT * FROM ENVIRONMENT ORDER BY ID DESC;" providertype="sql" />
+
+		<datasource name="postPlan" httpheader="header" source="" query="/" providertype="json" httpmethod="post" />
+		<datasource name="planUpdate" httpheader="header" source="" query="/" providertype="json" httpmethod="put" />
+		<datasource name="planGet" httpheader="header" source="" query="/" providertype="json" />
+
+		<datasource name="contacts" providertype="contacts" source="*" query="/contacts" />
+
+    <datasource name="write-coping" source="sql://cope" query="CREATE TABLE IF NOT EXISTS COPE (ID INTEGER PRIMARY KEY AUTOINCREMENT, nid TEXT, text TEXT, photo TEXT, type TEXT);" providertype="sql"/>
+    <datasource name="saved-coping" source="sql://cope" query="SELECT * FROM COPE ORDER BY ID DESC;" providertype="sql"/>
+
+	<httpheader name="uploadHeader" Accept="application/json" Content-Type="image/png"  />
+    <httpheader name="header" Accept="application/json" Content-type="application/json" />
+    
+    <httpheader name="pushHeader" Authorization="Basic c3M1TnpNeTNRMmF5eElIRVVOOTZpQTpFVFJSMGxuX1E1LVZFbDF0R1ZLNVpn" ></httpheader>
+    <datasource name="PushRegister" httpheader="pushHeader" source="" query="/" providertype="json" httpmethod="put"/>
+    <datasource name="pushlistener" source="" query="" providertype="push"/>
+    
+	<datasource name="photos" source="" query="Camera Roll" providertype="camera" querycomplete="buildPhotos"/> 
+    <datasource name="uploadPhoto" httpmethod="post" source="" query="/" providertype="json" httpheader="uploadHeader" urlcacheduration="1"/>
+
+    <datasource name="userAuth" httpheader="header" source="" query="//" providertype="json" httpmethod="post"/>
+    <datasource name="userGet" httpheader="header" source="" query="/" providertype="json" />
+    <datasource name="userUpdate" httpheader="header" source="" query="/" providertype="json" httpmethod="put"/>
+    
+    <datasource name="postActivity" httpheader="header" source="" query="/" providertype="json" httpmethod="post"/>
+    <datasource name="ActivityGet" httpheader="header" source="" query="/" providertype="json" />
+    
+    <datasource name="postWarnings" httpheader="header" source="" query="/" providertype="json" httpmethod="post"/>
+    <datasource name="WarningGet" httpheader="header" source="" query="/" providertype="json" />
+    
+    <datasource name="postInspire" httpheader="header" source="" query="/" providertype="json" httpmethod="post"/>
+    <datasource name="postInspireUpdate" httpheader="header" source="" query="/" providertype="json" httpmethod="put"/>
+    <datasource name="InspireGet" httpheader="header" source="" query="/" providertype="json" />
+
+    <datasource name="HomeGet" httpheader="header" source="" query="/homeViewEntry" providertype="json" />
+
+    
+    <datasource name="locator" source="" query="/" providertype="json" />
+    <datasource name="body" source="" query="//" providertype="json" /> 
+  </datasources>
+ 
+  <texttemplate name="postBody"><![CDATA[[var:postContent]]]></texttemplate>
+  
+
+  <texttemplate name="crudUser"><![CDATA[ { "id": "[var:userID]",
+                                            "name": { "first": "[var:userFirstName]", "middle": "x", "last": "[var:userLastName]", "display": "x" },
+                                            "email": "[var:userEmail]",
+                                            "phone": "555-5555",
+                                            "prefer": "text|email",
+                                            "home": { "street": ["111 main"],"city": "test","state": "mo", "zip": "11111", 
+                                            "loc": { "lat": 0, "lng": 0  } },
+                                            "plan": "[var:userPlan]",
+                                            "team": "[var:userTeam]",
+                                            "inspiration": "[var:InspireID]",
+                                            "genPrefs": { "appBackgroundImage": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e", "arbitraryPrefAttributeName": "arbitraryPrefAttributeValue", "anotherArbitraryPref": "anotherPrefValue" },
+                                            "devices":[{ "name": "xxx", "model": "x", "carrier": "xxx", "pushId": "[system:pushtoken]", 
+                                            "prefs": { "arbitraryDeviceSpecificPrefName": "prefValue", "anotherDevicePrefName": "anotherPrefValue" }}]
+                                            } ]]></texttemplate>
+  <texttemplate name="crudActivity"><![CDATA[ { "profile": "[var:userID]",
+                                                "mood": {
+                                                        "level": [var:mood],
+                                                        "description": "[var:feeling]"
+                                                     },
+                                                "content": "[var:currentActivityBody]"
+                                              } ]]></texttemplate>   
+  <texttemplate name="crudInspire"><![CDATA[   { 
+					    "profile": "[var:userID]",
+					    "photos":
+					        [
+					            {
+					                "label": "test",
+					                "notes": "test notes",
+					                "media": "https://samhsa.carewave.net/edm-mobile/rs/crud/blob/[var:photoID]"                
+					            }
+					                    ],
+					    "locations":
+					        [
+					            {
+					                "label": "",
+					                "notes": "",
+					                "media": "",                
+					                "loc":
+					                    {
+					                        "lat": 0,
+					                        "lng": 0
+					                    }
+					            }
+					        ],
+					    "quotes":
+					        [
+					            {
+					                "text": "",
+					                "link": "",
+					                "media": ""
+					            }
+					        ],
+					    "articles":
+					        [
+					            {
+					                "title": "",
+					                "summary": "",
+					                "link": "",
+					                "notes": ""
+					            },
+					            {
+					                "title": "",
+					                "summary": "",
+					                "link": "",
+					                "notes": ""
+					            }
+					        ],
+					    "driver":
+					        {
+					            "label": "",
+					            "notes": "",
+					            "media": ""                
+					        }
+					} 
+  												
+ 												]]></texttemplate>  
+ 		<texttemplate name="crudInspireUpdate"><![CDATA[   {  "id": "[var:InspireID]",
+					    "profile": "[var:userID]",
+					    "photos":
+					        [
+					            {
+					                "label": "test",
+					                "notes": "test notes",
+					                "media": "https://samhsa.carewave.net/edm-mobile/rs/crud/blob/[var:photoID]"                
+					            }
+					                    ],
+					    "locations":
+					        [
+					            {
+					                "label": "",
+					                "notes": "",
+					                "media": "",                
+					                "loc":
+					                    {
+					                        "lat": 0,
+					                        "lng": 0
+					                    }
+					            }
+					        ],
+					    "quotes":
+					        [
+					            {
+					                "text": "",
+					                "link": "",
+					                "media": ""
+					            }
+					        ],
+					    "articles":
+					        [
+					            {
+					                "title": "",
+					                "summary": "",
+					                "link": "",
+					                "notes": ""
+					            },
+					            {
+					                "title": "",
+					                "summary": "",
+					                "link": "",
+					                "notes": ""
+					            }
+					        ],
+					    "driver":
+					        {
+					            "label": "",
+					            "notes": "",
+					            "media": ""                
+					        }
+					} 
+  												
+ 												]]></texttemplate>  
+										
+	<texttemplate name="crudPlan"><![CDATA[{
+			   "profile": "[var:userID]",
+			   "warnings":[
+			      {
+			         "label":"[var:warning1-label]",
+			         "type":"[var:warning1-type]",
+			         "notes":"[var:warning1-notes]"
+			      },
+			      {
+			         "label":"[var:warning2-label]",
+			         "type":"[var:warning2-type]",
+			         "notes":"[var:warning2-notes]"
+			      },
+			      {
+			         "label":"[var:warning3-label]",
+			         "type":"[var:warning3-type]",
+			         "notes":"[var:warning3-notes]"
+			      },
+			      {
+			         "label":"[var:warning4-label]",
+			         "type":"[var:warning4-type]",
+			         "notes":"[var:warning5-notes]"
+			      },
+			      {
+			         "label":"[var:warning5-label]",
+			         "type":"[var:warning5-type]",
+			         "notes":"[var:warning5-notes]"
+			      },
+			      {
+			         "label":"[var:warning6-label]",
+			         "type":"[var:warning6-type]",
+			         "notes":"[var:warning6-notes]"
+			      },
+			      {
+			         "label":"[var:warning7-label]",
+			         "type":"[var:warning7-type]",
+			         "notes":"[var:warning7-notes]"
+			      },
+			      {
+			         "label":"[var:warning8-label]",
+			         "type":"[var:warning8-type]",
+			         "notes":"[var:warning8-notes]"
+			      },
+			      {
+			         "label":"[var:warning9-label]",
+			         "type":"[var:warning9-type]",
+			         "notes":"[var:warning9-notes]"
+			      },
+			      {
+			         "label":"[var:warning10-label]",
+			         "type":"[var:warning10-type]",
+			         "notes":"[var:warning10-notes]"
+			      }
+			   ],
+			   "inspiration":[
+			      {
+			         "label":"[var:inspiration1-label]",
+			         "type":"[var:inspiration1-type]",
+			         "notes":"[var:inspiration1-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration1-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration2-label]",
+			         "type":"[var:inspiration2-type]",
+			         "notes":"[var:inspiration2-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration2-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration3-label]",
+			         "type":"[var:inspiration3-type]",
+			         "notes":"[var:inspiration3-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration3-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration4-label]",
+			         "type":"[var:inspiration4-type]",
+			         "notes":"[var:inspiration4-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration4-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration5-label]",
+			         "type":"[var:inspiration5-type]",
+			         "notes":"[var:inspiration5-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration5-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration6-label]",
+			         "type":"[var:inspiration6-type]",
+			         "notes":"[var:inspiration6-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration6-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration7-label]",
+			         "type":"[var:inspiration7-type]",
+			         "notes":"[var:inspiration7-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration7-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration8-label]",
+			         "type":"[var:inspiration8-type]",
+			         "notes":"[var:inspiration8-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration8-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration9-label]",
+			         "type":"[var:inspiration9-type]",
+			         "notes":"[var:inspiration9-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration9-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration10-label]",
+			         "type":"[var:inspiration10-type]",
+			         "notes":"[var:inspiration10-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration10-imageUrl]"
+			      }
+			   ],
+			   "techniques":[
+			      {
+			         "type":"[var:coping1-type]",
+			         "label":"[var:coping1-label]",
+			         "nodeID": "[var:coping1-nodeID]",
+			         "photo": "[var:coping1-photo]"
+			      },
+			      {
+			         "type":"[var:coping2-type]",
+			         "label":"[var:coping2-label]",
+			         "nodeID": "[var:coping2-nodeID]",
+			         "photo": "[var:coping2-photo]"
+			      },
+			      {
+			         "type":"[var:coping3-type]",
+			         "label":"[var:coping3-label]",
+			         "nodeID": "[var:coping3-nodeID]",
+			         "photo": "[var:coping3-photo]"
+			      },
+			      {
+			         "type":"[var:coping4-type]",
+			         "label":"[var:coping4-label]",
+			         "nodeID": "[var:coping4-nodeID]",
+			         "photo": "[var:coping4-photo]"
+			      },
+			      {
+			         "type":"[var:coping5-type]",
+			         "label":"[var:coping5-label]",
+			         "nodeID": "[var:coping5-nodeID]",
+			         "photo": "[var:coping5-photo]"
+			      },
+			      {
+			         "type":"[var:coping6-type]",
+			         "label":"[var:coping6-label]",
+			         "nodeID": "[var:coping6-nodeID]",
+			         "photo": "[var:coping6-photo]"
+			      },
+			      {
+			         "type":"[var:coping7-type]",
+			         "label":"[var:coping7-label]",
+			         "nodeID": "[var:coping7-nodeID]",
+			         "photo": "[var:coping7-photo]"
+			      },
+			      {
+			         "type":"[var:coping8-type]",
+			         "label":"[var:coping8-label]",
+			         "nodeID": "[var:coping8-nodeID]",
+			         "photo": "[var:coping8-photo]"
+			      },
+			      {
+			         "type":"[var:coping9-type]",
+			         "label":"[var:coping9-label]",
+			         "nodeID": "[var:coping9-nodeID]",
+			         "photo": "[var:coping9-photo]"
+			      },
+			      {
+			         "type":"[var:coping10-type]",
+			         "label":"[var:coping10-label]",
+			         "nodeID": "[var:coping10-nodeID]",
+			         "photo": "[var:coping10-photo]"
+			      },
+			      {
+			         "type":"[var:coping11-type]",
+			         "label":"[var:coping11-label]",
+			         "nodeID": "[var:coping11-nodeID]",
+			         "photo": "[var:coping11-photo]"
+			      },
+			      {
+			         "type":"[var:coping12-type]",
+			         "label":"[var:coping12-label]",
+			         "nodeID": "[var:coping12-nodeID]",
+			         "photo": "[var:coping12-photo]"
+			      },
+			      {
+			         "type":"[var:coping13-type]",
+			         "label":"[var:coping13-label]",
+			         "nodeID": "[var:coping13-nodeID]",
+			         "photo": "[var:coping13-photo]"
+			      },
+			      {
+			         "type":"[var:coping14-type]",
+			         "label":"[var:coping14-label]",
+			         "nodeID": "[var:coping14-nodeID]",
+			         "photo": "[var:coping14-photo]"
+			      },
+			      {
+			         "type":"[var:coping15-type]",
+			         "label":"[var:coping15-label]",
+			         "nodeID": "[var:coping15-nodeID]",
+			         "photo": "[var:coping15-photo]"
+			      },
+			      {
+			         "type":"[var:coping16-type]",
+			         "label":"[var:coping16-label]",
+			         "nodeID": "[var:coping16-nodeID]",
+			         "photo": "[var:coping16-photo]"
+			      },
+			      {
+			         "type":"[var:coping17-type]",
+			         "label":"[var:coping17-label]",
+			         "nodeID": "[var:coping17-nodeID]",
+			         "photo": "[var:coping17-photo]"
+			      },
+			      {
+			         "type":"[var:coping18-type]",
+			         "label":"[var:coping18-label]",
+			         "nodeID": "[var:coping18-nodeID]",
+			         "photo": "[var:coping18-photo]"
+			      }
+			   ],
+			   "environment":[
+			      {
+			         "label":"[var:environment1]"
+			      },
+			      {
+			         "label":"[var:environment2]"
+			      },
+			      {
+			         "label":"[var:environment3]"
+			      },
+			      {
+			         "label":"[var:environment4]"
+			      },
+			      {
+			         "label":"[var:environment5]"
+			      },
+			      {
+			         "label":"[var:environment6]"
+			      },
+			      {
+			         "label":"[var:environment7]"
+			      },
+			      {
+			         "label":"[var:environment8]"
+			      },
+			      {
+			         "label":"[var:environment9]"
+			      },
+			      {
+			         "label":"[var:environment10]"
+			      }
+			      ]
+			}]]></texttemplate>
+	<texttemplate name="crudPlanUpdate"><![CDATA[{
+			   "profile": "[var:userID]",
+			   "id": "[var:userPlan]",
+			   "warnings":[
+			      {
+			         "label":"[var:warning1-label]",
+			         "type":"[var:warning1-type]",
+			         "notes":"[var:warning1-notes]"
+			      },
+			      {
+			         "label":"[var:warning2-label]",
+			         "type":"[var:warning2-type]",
+			         "notes":"[var:warning2-notes]"
+			      },
+			      {
+			         "label":"[var:warning3-label]",
+			         "type":"[var:warning3-type]",
+			         "notes":"[var:warning3-notes]"
+			      },
+			      {
+			         "label":"[var:warning4-label]",
+			         "type":"[var:warning4-type]",
+			         "notes":"[var:warning5-notes]"
+			      },
+			      {
+			         "label":"[var:warning5-label]",
+			         "type":"[var:warning5-type]",
+			         "notes":"[var:warning5-notes]"
+			      },
+			      {
+			         "label":"[var:warning6-label]",
+			         "type":"[var:warning6-type]",
+			         "notes":"[var:warning6-notes]"
+			      },
+			      {
+			         "label":"[var:warning7-label]",
+			         "type":"[var:warning7-type]",
+			         "notes":"[var:warning7-notes]"
+			      },
+			      {
+			         "label":"[var:warning8-label]",
+			         "type":"[var:warning8-type]",
+			         "notes":"[var:warning8-notes]"
+			      },
+			      {
+			         "label":"[var:warning9-label]",
+			         "type":"[var:warning9-type]",
+			         "notes":"[var:warning9-notes]"
+			      },
+			      {
+			         "label":"[var:warning10-label]",
+			         "type":"[var:warning10-type]",
+			         "notes":"[var:warning10-notes]"
+			      }
+			   ],
+			   "inspiration":[
+			      {
+			         "label":"[var:inspiration1-label]",
+			         "type":"[var:inspiration1-type]",
+			         "notes":"[var:inspiration1-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration1-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration2-label]",
+			         "type":"[var:inspiration2-type]",
+			         "notes":"[var:inspiration2-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration2-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration3-label]",
+			         "type":"[var:inspiration3-type]",
+			         "notes":"[var:inspiration3-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration3-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration4-label]",
+			         "type":"[var:inspiration4-type]",
+			         "notes":"[var:inspiration4-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration4-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration5-label]",
+			         "type":"[var:inspiration5-type]",
+			         "notes":"[var:inspiration5-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration5-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration6-label]",
+			         "type":"[var:inspiration6-type]",
+			         "notes":"[var:inspiration6-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration6-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration7-label]",
+			         "type":"[var:inspiration7-type]",
+			         "notes":"[var:inspiration7-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration7-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration8-label]",
+			         "type":"[var:inspiration8-type]",
+			         "notes":"[var:inspiration8-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration8-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration9-label]",
+			         "type":"[var:inspiration9-type]",
+			         "notes":"[var:inspiration9-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration9-imageUrl]"
+			      },
+			      {
+			         "label":"[var:inspiration10-label]",
+			         "type":"[var:inspiration10-type]",
+			         "notes":"[var:inspiration10-notes]",
+			         "loc":{
+			            "lat":"",
+			            "lng":""
+			         },
+			         "media":"[var:inspiration10-imageUrl]"
+			      }
+			   ],
+			   "techniques":[
+			      {
+			         "type":"[var:coping1-type]",
+			         "label":"[var:coping1-label]",
+			         "nodeID": "[var:coping1-nodeID]",
+			         "photo": "[var:coping1-photo]"
+			      },
+			      {
+			         "type":"[var:coping2-type]",
+			         "label":"[var:coping2-label]",
+			         "nodeID": "[var:coping2-nodeID]",
+			         "photo": "[var:coping2-photo]"
+			      },
+			      {
+			         "type":"[var:coping3-type]",
+			         "label":"[var:coping3-label]",
+			         "nodeID": "[var:coping3-nodeID]",
+			         "photo": "[var:coping3-photo]"
+			      },
+			      {
+			         "type":"[var:coping4-type]",
+			         "label":"[var:coping4-label]",
+			         "nodeID": "[var:coping4-nodeID]",
+			         "photo": "[var:coping4-photo]"
+			      },
+			      {
+			         "type":"[var:coping5-type]",
+			         "label":"[var:coping5-label]",
+			         "nodeID": "[var:coping5-nodeID]",
+			         "photo": "[var:coping5-photo]"
+			      },
+			      {
+			         "type":"[var:coping6-type]",
+			         "label":"[var:coping6-label]",
+			         "nodeID": "[var:coping6-nodeID]",
+			         "photo": "[var:coping6-photo]"
+			      },
+			      {
+			         "type":"[var:coping7-type]",
+			         "label":"[var:coping7-label]",
+			         "nodeID": "[var:coping7-nodeID]",
+			         "photo": "[var:coping7-photo]"
+			      },
+			      {
+			         "type":"[var:coping8-type]",
+			         "label":"[var:coping8-label]",
+			         "nodeID": "[var:coping8-nodeID]",
+			         "photo": "[var:coping8-photo]"
+			      },
+			      {
+			         "type":"[var:coping9-type]",
+			         "label":"[var:coping9-label]",
+			         "nodeID": "[var:coping9-nodeID]",
+			         "photo": "[var:coping9-photo]"
+			      },
+			      {
+			         "type":"[var:coping10-type]",
+			         "label":"[var:coping10-label]",
+			         "nodeID": "[var:coping10-nodeID]",
+			         "photo": "[var:coping10-photo]"
+			      },
+			      {
+			         "type":"[var:coping11-type]",
+			         "label":"[var:coping11-label]",
+			         "nodeID": "[var:coping11-nodeID]",
+			         "photo": "[var:coping11-photo]"
+			      },
+			      {
+			         "type":"[var:coping12-type]",
+			         "label":"[var:coping12-label]",
+			         "nodeID": "[var:coping12-nodeID]",
+			         "photo": "[var:coping12-photo]"
+			      },
+			      {
+			         "type":"[var:coping13-type]",
+			         "label":"[var:coping13-label]",
+			         "nodeID": "[var:coping13-nodeID]",
+			         "photo": "[var:coping13-photo]"
+			      },
+			      {
+			         "type":"[var:coping14-type]",
+			         "label":"[var:coping14-label]",
+			         "nodeID": "[var:coping14-nodeID]",
+			         "photo": "[var:coping14-photo]"
+			      },
+			      {
+			         "type":"[var:coping15-type]",
+			         "label":"[var:coping15-label]",
+			         "nodeID": "[var:coping15-nodeID]",
+			         "photo": "[var:coping15-photo]"
+			      },
+			      {
+			         "type":"[var:coping16-type]",
+			         "label":"[var:coping16-label]",
+			         "nodeID": "[var:coping16-nodeID]",
+			         "photo": "[var:coping16-photo]"
+			      },
+			      {
+			         "type":"[var:coping17-type]",
+			         "label":"[var:coping17-label]",
+			         "nodeID": "[var:coping17-nodeID]",
+			         "photo": "[var:coping17-photo]"
+			      },
+			      {
+			         "type":"[var:coping18-type]",
+			         "label":"[var:coping18-label]",
+			         "nodeID": "[var:coping18-nodeID]",
+			         "photo": "[var:coping18-photo]"
+			      }
+			   ],
+			   "environment":[
+			      {
+			         "label":"[var:environment1]"
+			      },
+			      {
+			         "label":"[var:environment2]"
+			      },
+			      {
+			         "label":"[var:environment3]"
+			      },
+			      {
+			         "label":"[var:environment4]"
+			      },
+			      {
+			         "label":"[var:environment5]"
+			      },
+			      {
+			         "label":"[var:environment6]"
+			      },
+			      {
+			         "label":"[var:environment7]"
+			      },
+			      {
+			         "label":"[var:environment8]"
+			      },
+			      {
+			         "label":"[var:environment9]"
+			      },
+			      {
+			         "label":"[var:environment10]"
+			      }
+			      ]
+			}]]></texttemplate>
+	<texttemplate name="crudTeam"><![CDATA[{
+				 "id": "51d321e28ae0d6cb305aa984",
+				 "profile": "[var:userID]",
+				 "created": "2013-07-03T13:48:10-0500",
+				 "updated": "2013-07-04T13:48:10-0500",
+				 "members":[
+				 {
+				 "name": 
+				 {
+				 "first": "John",
+				 "middle": "P.",
+				 "last": "Public",
+				 "display": "Dad"
+				 },
+				 "email": "johnnyp555@gmail.com",
+				 "phone": "816-555-1234",
+				 "relationship": "Father",
+				 "pic": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e" 
+				 },
+				 {
+				 "name": 
+				 {
+				 "first": "Jane",
+				 "middle": "Q.",
+				 "last": "Public",
+				 "display": "Mom"
+				 },
+				 "email": "janeq555@gmail.com",
+				 "phone": "816-555-1234",
+				 "relationship": "Mother",
+				 "pic": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e" 
+				 }
+				 ]
+				}]]></texttemplate>
+  
+  
+  
+  <styles>
+    <style name="textfield" font="helvetica" size="15" color="#000000" alignment="left" valignment="center" border="line" margin-top="10" background="#ffffff" leftinset="5" onreturnkeypressed="dismiss-keyboard"  />
+    <style name="headline" font="HelveticaNeue-Bold" color="#8fbf6b" size="15" /> <!-- green text -->
+    <style name="step-label" font="HelveticaNeue" color="#ffffff" size="13" alignment="center" />
+    <style name="step-question" font="HelveticaNeue" color="#666666" size="15" alignment="center" />
+  </styles>
+
+  <classes>
+    <class name="toc"> 
+      <panel name="[param:section]" width="100%" height="50" onclickup="reveal-section">
+          <panel name="wrapper" width="100%" height="100%" padding="10">
+            <image name="icon" source="graphics/[param:icon]" width="44" height="44" valign="center" />
+            <text name="label" height="100%" width="100%" rightof="icon" text="[param:label]" font="HelveticaNeue" color="#92c05d" size="15" alignment="left" leftinset="20"/>
+          </panel>
+          <panel name="rule" width="100%" height="1" valign="bottom" background="#126f93"></panel>
+      </panel>
+    </class>
+    <class name="toolbar">
+      <panel name="toolbar" alias="TOOLBAR" height="44" width="100%" background="#126f93" padding-left="10" padding-right="10">
+        <text name="label" height="100%" width="100%" font="HelveticaNeue" text="[param:label]" color="#efefef" size="15" alignment="center"/>
+        <image name="btn-left" source="graphics/icon-top-menu.png" valign="center" onclickup="toggle-toc" />
+        <image name="btn-right" source="graphics/icon-top-attach.png" valign="center"  align="right" alpha="1" onclickup="choose-inspiration-attachment" />
+      </panel>
+    </class>
+    <class name="button">
+      <panel name="button" width="80%" height="44" background="#6d97a9" alpha="1" align="center" valign="center" borderwidth="1" bordercolor="#000000" cornerradius="5" onclickup="[param:onclickup]">
+        <text name="label" height="100%" width="100%" text="[param:text]" font="HelveticaNeue-Bold" color="#ffffff" size="15" alignment="center"/>
+      </panel>
+    </class>
+    <class name="buttonWithIcon">
+      <panel name="button" _cam="[param:cam]" width="80%" height="44" background="#6d97a9" alpha="1" align="center" valign="center" borderwidth="1" bordercolor="#000000" cornerradius="5" onclickup="[param:onclickup]" padding-left="10">
+        <text name="label" height="100%" width="100%" text="[param:text]" font="HelveticaNeue" color="#ffffff" size="15" alignment="left" leftinset="30">
+          <image name="icon" source="graphics/[param:icon]" valign="center"></image>
+        </text>
+      </panel>
+    </class>
+    <class name="helpcenter-row">
+      <panel name="row-[param:index]" width="100%" height="20%" padding-left="10" padding-right="10">
+         <panel name="icon" width="44" height="44" valign="center" background="#ff0000"></panel>
+        <text name="label" width="100%" height="100%" rightof="icon" text="[param:label]" font="HelveticaNeue" size="15" alignment="left" leftinset="20"/>
+      </panel>
+    </class>
+    <class name="careteam-row">
+      <panel name="row-[param:index]" width="100%" height="20%" padding-left="10" padding-right="10">
+        <panel name="icon" width="44" height="44" valign="center" background="#ff0000"></panel>
+        <text name="name" width="100%" height="fit" ypos="20" rightof="icon" text="[param:name]" font="HelveticaNeue" size="15" alignment="left" leftinset="20" />
+        <text name="relationship" width="100%" height="fit" bottomof="name" margin-top="3" rightof="icon" text="[param:relationship]" font="HelveticaNeue" size="12" alignment="left" leftinset="20" />
+      </panel>
+    </class>
+    <class name="history-row">
+      <panel name="row-[param:index]" width="100%" height="20%">
+        <!--
+<panel name="date" width="15%" height="100%">
+          <panel name="stamp" width="100%" height="50" align="center" valign="center">
+            <text name="day" width="100%" height="20" text="[param:bigday]" color="8fbf6b" font="HelveticaNeue" size="15" alignment="center" />
+            <text name="date" width="100%" height="30" text="[param:bigdate]" color="8fbf6b" font="HelveticaNeue-Bold" size="25" alignment="center" bottomof="day"/>
+          </panel>
+          <panel name="v-rule" width="1" height="100%" background="#c5d8e0" align="right"></panel>
+        </panel>
+-->
+        <panel name="entry" width="100%" height="100%" padding="10" align="left">
+          <text name="title" width="85%" height="fit" text="[param:title]" font="HelveticaNeue" size="17" alignment="left" />
+          <text name="date" width="100%" height="fit" bottomof="title" margin-top="7" text="[param:date]" font="HelveticaNeue" size="13" alignment="left" />
+          <image name="mood" height="40%" source="graphics/icon-mood-[param:moodnum].png" align="right" valign="top" margin="10"></image>
+        </panel>
+        <panel name="h-rule" width="100%" height="1" background="#c5d8e0" valign="bottom"></panel>
+      </panel>
+    </class>
+    <class name="feeling-row">
+      <panel name="col-1" width="50%" height="100%">
+        <text name="option-[param:col-1-label]" height="100%" width="100%" font="HelveticaNeue" color="#000000" size="15" alignment="left" valign="bottom" leftinset="40" text="[param:col-1-label]" >
+          <panel name="checkbox" width="30" height="30" valign="center" background="#e9e9e9" bordercolor="#222222" borderwidth="1" onclickup="checkmarked" _label="[param:col-1-label]"></panel>
+        </text>
+      </panel>
+      <panel name="col-2" width="50%" height="100%" align="right">
+        <text name="option-[param:col-2-label]" height="100%" width="100%" font="HelveticaNeue" color="#000000" size="15" alignment="left" valign="bottom" leftinset="40" text="[param:col-2-label]" >
+          <panel name="checkbox" width="30" height="30" valign="center" background="#e9e9e9" bordercolor="#222222" borderwidth="1" onclickup="checkmarked" _label="[param:col-2-label]"></panel>
+        </text>
+      </panel>
+    </class>
+    <class name="remove-item">
+    	<panel name="remove-class-[param:index]" width="100%" height="15%" >
+			 <!-- <image name="arrow-expand" source="graphics/icon-content-arrow.png" padding-left="10" align="left" onclickup="expand-item"></image> -->
+			 <text name="[param:textfield]" alias="[param:textfield]" width="81%" height="65%" font="helvetica" size="16" color="666666" leftinset="3" alignment="left" valignment="center" background="#ccd9e5" text="[param:removetext]" onclickup="edit-item" _index="[param:index]" _id="[param:id]" ></text>
+			 <image name="subtract" source="graphics/icon-content-remove.png" clip="yes" align="right" onclickup="remove-item" _id="[param:id]" ></image>			
+		  </panel>
+    </class>
+		<!-- !Add-item Class -->
+		<class name="add-item">
+			<panel name="add-item[param:index]" width="100%" height="90%" align="center" valign="center" background="#ff0000" >
+				<panel name="warningEntryTitle-wrapper" width="100%" height="100">
+					<textfield name="[param:textfield]" alias="[param:item-alias]-LABEL-[param:index]" width="81%" height="44" leftinset="3" style="textfield" align="left" placeholder="What makes you feel bad?" text="[param:label]" />
+<!-- 					<image name="add" source="graphics/icon-content-add.png" align="right" clip="yes" ypos="2" onclickup="add-entry" clickuptarget="WRAPPER" /> -->
+					<text name="type" alias="[param:item-alias]-TYPE-[param:index]" width="81%" height="44" background="#ffffff" font="helvetica" size="16" color="666666" leftinset="3" alignment="left" valignment="center" align="left" borderwidth="1" bordercolor="000000" text="[param:type]" bottomof="[param:textfield]" topmargin="10" onclickup="launch-dropdown" _dropdown="[param:dropdown]" _index="[param:index]" />
+				</panel>
+				<panel name="warningEntryBody-wrapper" width="100%" height="132" bottomof="warningEntryTitle-wrapper" margin-top="10">
+					<textfield name="[param:add-notes]" alias="[param:item-alias]-NOTES-[param:index]" width="81%" height="98%" style="textfield" valign="center" placeholder="Notes" multiline="yes" borderwidth="1" bordercolor="#000000" text="[param:notes]" />
+					<!-- 				<image name="attach" source="graphics/icon-content-attach.png" align="right" topmargin="10" valign="top" onclickup="add-attach"></image> -->
+					<image name="share" source="graphics/icon-content-share.png" valign="top" align="right" onclickup="add-share" rightmargin="10" />
+				</panel>
+				<panel name="col1" width="40%" height="60" align="left" bottomof="warningEntryBody-wrapper" >
+					<object class="button" text="Cancel" onclickup="close-plan-item" />
+				</panel>
+				<panel name="col2" width="40%" height="60" align="right" bottomof="warningEntryBody-wrapper" >
+					<object class="button" text="Save" onclickup="save-plan-item" />
+				</panel>
+			</panel>
+		</class>
+		<class name="dropdown-item">
+			<panel name="[param:dropdown-item]" width="100%" height="15%" >
+				<panel name="text-block" width="100%" height="100%" >
+					<text name="text" width="100%" height="100%" color="#000000" font="Helvetica" size="16" alignment="left" leftinset="5" text="[param:text]" onclickup="select-type" />
+					<!-- 				<text name="contact-description" width="100%" height="20%" color="#000000" font="Helvetica" size="12" alignment="left" leftinset="5" text="[param:description]" bottomof="contact-name"></text> -->
+				</panel>
+				<panel name="break" width="100%" height="1" background="666666" topmargin="3" bottomof="contact-image" />
+			</panel>
+		</class>
+		<class name="kb-filler">
+			<panel name="kb-filler" width="100%" height="216" lheight="150" />
+		</class>
+    <class name="add-environment">
+    	<panel name="add-environment" width="100%" height="55%" >
+  			<panel name="enviroEntryTitle-wrapper" width="100%" height="132" align="center" valign="center" >
+  				<textfield name="[param:textfield]" alias="[param:item-alias]-LABEL-[param:index]" width="81%" align="center" height="98%" leftinset="3" style="textfield" multiline="yes" borderwidth="1" bordercolor="#000000" placeholder="What are you going to do?" ></textfield>
+<!--           <image name="add" source="graphics/icon-content-add.png" align="right" clip="yes" ypos="2" onclickup="add-entry"></image> -->
+        	</panel>
+			<panel name="col1" width="40%" height="60" align="left" bottomof="enviroEntryTitle-wrapper" >
+				<object class="button" text="Cancel" onclickup="close-environment-item" />
+			</panel>
+			<panel name="col2" width="40%" height="60" align="right" bottomof="enviroEntryTitle-wrapper" >
+				<object class="button" text="Save" onclickup="save-environment-item" />
+			</panel>
+		</panel>  
+    </class>
+    <class name="remove-environment">
+    	<panel name="remove-class-[param:index]" width="100%" height="15%" >
+			 <!-- <image name="arrow-expand" source="graphics/icon-content-arrow.png" padding-left="10" align="left" onclickup="expand-item"></image> -->
+			 <text name="[param:textfield]" alias="[param:textfield]" width="81%" height="65%" font="helvetica" size="16" color="666666" leftinset="3" alignment="left" valignment="center" background="#ccd9e5" text="[param:removetext]" onclickup="edit-environment-item" _index="[param:index]" _id="[param:id]" ></text>
+			 <image name="subtract" source="graphics/icon-content-remove.png" clip="yes" align="right" onclickup="remove-environment-item" _id="[param:id]" ></image>			
+		  </panel>
+    </class>
+		<!-- !Contact-item Class -->
+		<class name="contact-item-ds">
+			<panel name="[param:contact-item]" width="100%" height="15%" onclickup="select-contact">
+				<image name="contact-image" fullpath="[param:contact-image]" xpos="5" valign="center" height="80%" />
+				<panel name="text-block" width="80%" height="100%" rightof="contact-image">
+					<text name="contact-name" width="100%" height="50%" color="#000000" font="Helvetica" size="16" alignment="left" leftinset="3" text="[param:name]" />
+					<!-- 				<text name="contact-description" width="100%" height="20%" color="#000000" font="Helvetica" size="12" alignment="left" leftinset="5" text="[param:description]" bottomof="contact-name"></text> -->
+				</panel>
+				<panel name="break" width="100%" height="1" background="666666" topmargin="3" bottomof="contact-image" />
+			</panel>
+		</class>
+		<class name="contact-item">
+			<panel name="[param:contact-item]" width="100%" height="15%">
+				<image name="contact-image" fullpath="[param:contact-image]" height="80%" xpos="5" valign="center" />
+				<panel name="text-block" width="80%" height="100%" rightof="contact-image">
+					<text name="contact-name" width="100%" height="50%" color="#000000" font="Helvetica" size="16" alignment="left" leftinset="3" text="[param:name]" />
+					<text name="contact-description" width="100%" height="20%" color="#000000" font="Helvetica" size="12" alignment="left" leftinset="5" text="[param:description]" bottomof="contact-name" />
+					<text name="can-contact-description" width="100%" height="20%" color="#000000" font="Helvetica" size="12" alignment="right" leftinset="5" text="Can message? [param:canContact]" bottomof="contact-name" />
+				</panel>
+				<panel name="break" width="100%" height="1" background="666666" topmargin="3" bottomof="contact-image" />
+			</panel>
+		</class>
+    <class name="coping-row">
+    	<panel name="col-1" width="90%" height="15%" align="center">
+        <text name="option-[param:label]" height="100%" width="100%" font="HelveticaNeue" color="#000000" size="15" alignment="left" valign="bottom" leftinset="40" text="[param:label]" >
+          <panel name="checkbox" width="30" height="30" valign="center" background="#e9e9e9" bordercolor="#222222" borderwidth="1" onclickup="add-coping-item" _text="[param:label]"  _photo="[param:photo]" _nodeID="[param:nodeID]" _type="[param:type]"></panel>
+        </text>
+      </panel>
+    </class>
+    <class name="add-coping-row">
+    	<panel name="row" width="90%" height="15%" align="center" >
+			<panel name="checkbox" width="30" height="30" valign="center" background="#e9e9e9" bordercolor="#222222" borderwidth="1" onclickup="add-coping-item" _text="[param:label]"  _nodeID="[param:nodeID]" _type="[param:type]"></panel>
+			<textfield name="[param:textfield]" alias="[param:textfield]" width="60%" height="30" leftinset="3" size="13" alignment="left" valign="center" valignment="center" border="line" margin-top="10" background="#ffffff" onreturnkeypressed="dismiss-keyboard" xpos="15%" placeholder="Other"></textfield>
+		</panel>
+    </class>
+	<class name="coping-item">
+		<panel name="pg[param:item]" width="100%" height="100%" onscrollto="paginate">
+	    	<text name="activity" height="44" width="100%" style="headline" text="[param:text]" alignment="center" align="center"/>
+	        <image name="coping-image" source="[param:source]" height="70%" width="80%" align="center" valign="center" background="#ff0000"></image>
+	     </panel>
+	</class>
+    
+    
+    
+    <class name="sleep-item">
+    	<panel name="option-[param:item]" alias="OPTION-[param:item]" width="100%" height="15%" background="ffffff" align="center">
+             <text name="option-text1" width="100%" height="99%" color="666666" font="helvetica" size="16" alignment="center" text="[param:sleeptext]" _active="[param:item]" onclickup="active-sleep-item"></text>
+             <panel name="break" width="100%" height="1" background="333333" valign="bottom"></panel>
+        </panel>
+    </class>
+    <class name="create-mood-check">
+    	<panel name="moodcheck" alias="MOODCHECK" width="100%" height="164">
+	    	<text name="headline" height="44" width="100%" style="headline" text="How do I feel right now?" alignment="left" />
+	        <panel name="feeling-checkbox" width="100%" height="120" bottomof="headline">
+	          <panel name="row-1" alias="ROW1" width="100%" height="33.3%" >
+	          
+	          </panel>
+	          <panel name="row-2" alias="ROW2" width="100%" height="33.3%" bottomof="row-1">
+	          
+	          </panel>
+	          <panel name="row-3" alias="ROW3" width="100%" height="33.3%" bottomof="row-2">
+	            
+	          </panel>
+	        </panel>
+		</panel>
+    </class>
+    <class name="annotations">
+      <annotation name="[param:location]" alias="[param:location]" location="[param:location]" title="[param:title]" subtitle="[param:subtitle]" color="red" accessoryviewheight="100" animateddrop="no">
+      		<image name="image" source="graphics/annotation-arrow.png" ypos="-10%" leftmargin="20"  onclickup="call-map" _phonenumber="[param:phone]"></image>
+
+      </annotation>
+    </class>
+    		<!-- !Camera -->
+            <class name="camera">
+                  <camera name="camera" alias="CAMERA-OBJECT" height="100%" width="100%" face="[param:face]" type="video" valign="bottom"></camera>
+            </class>
+            
+            <class name="avatar">
+                  <image name="photo" alias="AVATAR-SMALL" source="graphics/img-contact-female.png"  width="100%" align="center" valign="center" ></image>
+            </class>
+
+			<class name="avatarLarge">
+				<image name="photo" alias="AVATAR-LARGE" source="graphics/img-contact-female.png" width="100%" align="center" valign="center" ></image>
+			</class>
+			
+			
+            <class name="rollPager">
+   			<pager name="roll" width="100%" height="100%" orientation="vertical" paginate="no">
+   				<panel name="fill" width="100%" height="60"></panel>
+  			</pager>
+            </class>
+
+		<class name="rollRow3">
+			<panel name="[param:index]" width="100%" height="110" >
+				<panel name="a" width="33.3%" height="100%" _row="[param:index]" _column="a" onclickup="select-rollPhoto" _assetIndex="[param:index]" >
+					<panel name="imageCrop" width="95" height="95" align="center" valign="center" background="000000" clip="yes">
+						<image name="image" url="[param:imagea]" width="100%" align="center" valign="center"></image>
+						<image name="check" source="graphics/camera-check.png" align="center" valign="center" alpha="0"></image>
+					</panel>
+				</panel>
+				<panel name="b" width="33.3%" height="100%" align="center"  _row="[param:index]" _column="b" onclickup="select-rollPhoto" _assetIndex="[eval: [param:index] + 1]" >
+					<panel name="imageCrop" width="95" height="95" align="center" valign="center" background="000000">
+						<image name="image" url="[param:imageb]" width="100%" align="center" valign="center"></image>
+						<image name="check" source="graphics/camera-check.png" align="center" valign="center" alpha="0"></image>
+					</panel>
+				</panel>
+				<panel name="c" width="33.3%" height="100%" align="right"  _row="[param:index]" _column="c" onclickup="select-rollPhoto" _assetIndex="[eval: [param:index] + 2]" >
+					<panel name="imageCrop" width="95" height="95" align="center" valign="center" background="000000">
+						<image name="image" url="[param:imagec]" width="100%" align="center" valign="center"></image>
+						<image name="check" source="graphics/camera-check.png" align="center" valign="center" alpha="0"></image>
+					</panel>
+				</panel>
+			</panel>
+		</class>
+
+		<class name="rollRow2">
+			<panel name="[param:index]" width="100%" height="110" >
+				<panel name="a" width="33.3%" height="100%" _row="[param:index]" _column="a" onclickup="select-rollPhoto" _assetIndex="[param:index]" >
+					<panel name="imageCrop" width="95" height="95" align="center" valign="center" background="000000" clip="yes">
+						<image name="image" source="[param:imagea]" width="100%" align="center" valign="center"></image>
+						<image name="check" source="graphics/camera-check.png" align="center" valign="center" alpha="0"></image>
+					</panel>
+				</panel>
+				<panel name="b" width="33.3%" height="100%" align="center"  _row="[param:index]" _column="b" onclickup="select-rollPhoto" _assetIndex="[eval: [param:index] + 1]" >
+					<panel name="imageCrop" width="95" height="95" align="center" valign="center" background="000000">
+						<image name="image" source="[param:imageb]" width="100%" align="center" valign="center"></image>
+						<image name="check" source="graphics/camera-check.png" align="center" valign="center" alpha="0"></image>
+					</panel>
+				</panel>
+			</panel>
+		</class>
+		
+		<class name="rollRow1">
+			<panel name="[param:index]" width="100%" height="110" >
+				<panel name="a" width="33.3%" height="100%" _row="[param:index]" _column="a" onclickup="select-rollPhoto" _assetIndex="[param:index]" >
+					<panel name="imageCrop" width="95" height="95" align="center" valign="center" background="000000" clip="yes">
+						<image name="image" source="[param:imagea]" width="100%" align="center" valign="center"></image>
+						<image name="check" source="graphics/camera-check.png" align="center" valign="center" alpha="0"></image>
+					</panel>
+				</panel>
+			</panel>
+		</class>
+<!--Home Feed Classes-->		
+		<class name="homefeed-2">
+        	<panel name="row[param:index]" width="100%" height="150">
+        		<panel name="middle" width="1" height="100%" align="center"></panel>
+		        <panel name="col1" width="50%" height="170" clip="yes" leftof="middle" background="ffffff">
+		        	<text name="text" width="90%" height="85%" color="#666666" font="HelveticaNeue-Bold" size="16" alignment="center" text="[param:text]" align="center" valign="center" background="ddeccd"></text>
+			        
+			        <image name="img" url="[param:photo]" width="95%" height="85%" topmargin="7" align="center" valign="top" ></image>
+			        <panel name="title" width="95%" height="10%" align="center" valign="bottom" background="ffffff">
+			        	
+			        </panel>	
+		        </panel> 
+		        <panel name="col2" width="50%"  height="170" clip="yes" rightof="middle" background="ffffff">		 
+		        	<text name="text" width="90%" height="85%" color="#666666" font="HelveticaNeue-Bold" size="16" alignment="center" text="[param:text2]" align="center" valign="center" background="ddeccd"></text>
+		        	<image name="img2" url="[param:photo2]" width="95%" height="85%" topmargin="7" align="center" valign="top"></image>
+		        	<panel name="title" width="95%" height="10%" align="center" valign="bottom" background="ffffff">
+			        	
+			        </panel>
+		        </panel>
+	        </panel>
+        </class>
+        <class name="homefeed-1">
+        	<panel name="row[param:index]" width="100%" height="150">
+        		<panel name="middle" width="1" height="100%" align="center"></panel>
+		        <panel name="col1" width="50%" height="170" clip="yes" leftof="middle" background="ffffff">
+			        <text name="text" width="90%" height="85%" color="#666666" font="HelveticaNeue-Bold" size="16" alignment="center" text="[param:text]" align="center" valign="center" background="ddeccd"></text>
+			        <image name="img" url="[param:photo3]"  width="95%" height="85%" topmargin="7" align="center" valign="top"></image>
+			        <panel name="title" width="95%" height="10%" align="center" valign="bottom" background="ffffff">
+			        	
+			        </panel>	
+		        </panel> 
+		        <panel name="col2" width="50%"  height="150" rightof="middle" >		 
+		        	
+		        </panel>
+	        </panel>
+        </class>
+<!--map list view-->
+			   <class name="establishmentList">
+		   <panel name="[param:index]" width="90%" height="20.2%" align="center" _coords="[param:coords]" _location="[param:name]" _address="[param:address]" _address2="[param:address2]" _phone="[param:phone]"  _locationUrl="[param:locationUrl]" _index="[param:index]">
+        		<panel name="info" width="93%" height="80%" valign="center">
+	        		<text name="name" width="100%" height="fit" color="#666666" font="HelveticaNeue" size="18" alignment="left" text="[param:name]" ></text>
+	        		<panel name="address"  width="85%" height="30" bottomof="name"  _location="[param:name]" _address="[param:address]" _address2="[param:address2]"  _locationUrl="[param:locationUrl]" _index="[param:index]" _coords="[param:coords]">
+		        		<text name="address1" width="100%" height="14" color="#666666" font="HelveticaNeue" size="14" alignment="left"  text="[param:address1]" ></text>
+		        		<text name="address2" width="100%" height="14" color="#666666" font="HelveticaNeue" size="14" alignment="left" bottomof="address1" text="[param:address2]"></text>
+	        		</panel>
+	        		<text name="phone" width="100%" height="fit" color="#666666" font="HelveticaNeue" size="14" alignment="left" topmargin="5" bottomof="address" text="[param:phone]"></text>
+        		</panel>
+        		
+        		<panel name="bottomRule" width="100%" height="1" valign="bottom" background="#7c7470"></panel>
+    		</panel>
+	   </class>
+  </classes>
+
+  <main>
+      <!-- remove panel before submitting to store -->
+      <panel name="phone" width="320" height="568" align="center" valign="center" clip="yes"> 
+      <!-- remove panel before submitting to store -->
+      <panel name="navigation" alias="NAVIGATION" width="100%" height="100%" background="#001925" >
+          <panel name="calltoaction" height="88" width="80%" valign="bottom" onclickup="call-hotline">
+            <panel name="button" width="80%" height="44" background="#658e37" alpha="1" borderwidth="1" bordercolor="#000000" cornerradius="5"  align="center" valign="center">
+              <text name="label" height="100%" width="100%" text="HOTLINE" font="HelveticaNeue-Bold" color="#ffffff" size="15" alignment="center"/>
+            </panel>
+          </panel>
+          <pager name="toc" height="[eval: [object:NAVIGATION.height] - [object:NAVIGATION/calltoaction.height] ]" width="100%" orientation="vertical" paginate="no">
+            <object class="toc" section="Home" label="Home" icon="icon-menu-home.png"/>
+            <object class="toc" section="Safety Plan" label="Safety Plan" icon="icon-menu-safety.png"/>
+            <object class="toc" section="Journal" label="Journal" icon="icon-menu-journal.png"/>
+            <object class="toc" section="Inspiration" label="Inspiration" icon="icon-menu-inspiration.png"/>
+            <object class="toc" section="Coping Techniques" label="Coping Techniques" icon="icon-menu-strategy.png"/>
+            <object class="toc" section="Care Team" label="Care Team" icon="icon-menu-team.png"/>
+            <object class="toc" section="Treatment Locator" label="Treatment Locator" icon="icon-menu-location.png"/>
+            <object class="toc" section="Settings" label="Profile" icon="icon-menu-profile.png"/>
+          </pager>      
+      </panel>
+      <panel name="wrapper" alias="WRAPPER" width="100%" height="100%" clip="yes">
+          <object class="toolbar" label="Hello" />
+          <panel name="Home" alias="HOME" width="100%" height="[eval: [object:WRAPPER.height] - [object:TOOLBAR.height]]" bottomof="toolbar">
+            <panel name="feelingMeter" height="88" width="100%" background="#c5dcaa">
+              <panel name="a" width="20%" height="100%" onclick="reveal-journal">
+                <image name="face" source="graphics/icon-mood-a.png" align="center" valign="center" />
+              </panel>
+              <panel name="b" width="20%" xpos="20%" height="100%" onclick="reveal-journal">
+                <image name="face" source="graphics/icon-mood-b.png" align="center" valign="center" />
+              </panel>
+              <panel name="c" width="20%" xpos="40%" height="100%" onclick="reveal-journal">
+                <image name="face" source="graphics/icon-mood-c.png" align="center" valign="center" />
+              </panel>
+              <panel name="d" width="20%" xpos="60%" height="100%" onclick="reveal-journal">
+                <image name="face" source="graphics/icon-mood-d.png" align="center" valign="center" />
+              </panel>
+              <panel name="e" width="20%" xpos="80%" height="100%" onclick="reveal-journal">
+                <image name="face" source="graphics/icon-mood-e.png" align="center" valign="center" />
+              </panel>
+              <panel name="rule" width="100%" height="1" valign="bottom" background="#126f93"></panel>
+            </panel>
+            <!-- <pager name="main" ypos="[object:HOME/feelingMeter.height]" height="[eval: [object:HOME.height] - [object:HOME/feelingMeter.height]]" width="100%" background="#e1e1e1" orientation="vertical" paginate="no" lazy="yes"> -->
+            <tableview name="main" alias="HOMEFEED-TABLEVIEW" datasource="HomeGet" ypos="[object:HOME/feelingMeter.height]" height="[eval: [object:HOME.height] - [object:HOME/feelingMeter.height]]" width="100%" background="#ddeccd" rowheight="150" orientation="vertical" paginate="no" step="2">
+<!--               <panel name="trigger" width="100%" height="1" onscrollaway="toggle-filter" onscrollto="toggle-filter" /> -->
+              <object class="homefeed-2" index="[param:dataSourceIndex]" photo="[param:homeViewEntry/url]" photo2="[datasource:HomeGet.[eval:[param:dataSourceIndex] + 1].homeViewEntry/url]" text="[param:homeViewEntry/text]" text2="[datasource:HomeGet.[eval:[param:dataSourceIndex] + 1].homeViewEntry/text]" lhs="[param:dataSourceIndex]" operator="!=" rhs="[datasource:HomeGet.dataSourceResultCount]"/>
+              <object class="homefeed-1" index="[param:datasourceIndex]" photo="[param:homeViewEntry/url]" text="[param:homeViewEntry/text]" lhs="[param:dataSourceIndex]" operator="=" rhs="[datasource:HomeGet.dataSourceResultCount]"/>
+              
+            </tableview>
+            <!-- </pager> -->
+            <!--
+<panel name="filter" width="100%" height="44" ypos="100%">
+              <panel name="main" height="100%" width="100%" background="#bbbbbb">
+                 <text name="label" height="100%" width="100%" text="Filter Info" font="HelveticaNeue" color="#000000" size="13" alignment="center" />
+              </panel>
+            </panel>
+-->
+    <!-- 
+    journal entry screen 
+    -->
+            <panel name="journal" width="100%" height="[eval: [object:HOME.height] - [object:HOME/feelingMeter.height]]" ypos="100%" background="#ffffff">
+              <pager name="main" height="85%" width="100%" padding-top="5" padding-left="10" padding-right="10" orientation="vertical" paginate="no">
+                <panel name="checkbox-block" alias="CHECKBLOCK" width="100%" height="164"> 
+	               
+                </panel>
+                <!--<panel name="journalEntryTitle-wrapper" width="100%" height="64" >
+                  <textfield name="journalEntryTitle" width="100%" height="44" style="textfield" valign="center" placeholder="Journal Entry Title" />
+                </panel>-->
+                <panel name="currentActivityBody-wrapper" width="100%" height="130">
+                  <textfield name="currentActivityBody" alias="CURRENTACTIVITYBODY" width="80%" height="120" style="textfield" valign="center" placeholder="Notes" multiline="yes" borderwidth="1" bordercolor="#000000" />
+                  <image name="attach" source="graphics/icon-content-attach.png" align="right" valign="top" onclickup="journal-attach"></image>
+                  <image name="share" source="graphics/icon-content-share.png" bottomof="attach" align="right" onclickup="journal-share"></image>
+                </panel>
+                
+              	<panel name="call-to-action" height="15%" width="100%">
+                <panel name="col1" width="60%" height="100%">
+                  <text name="assesment" height="100%" width="100%" text="Take Assessment" font="HelveticaNeue" color="#89b0bf" size="15" alignment="left" valign="bottom" leftinset="20" onclickup="toggle-assessment"/>
+                </panel>
+                	<panel name="col2" width="40%" height="100%" align="right">
+                  		<object class="button" text="Save" onclickup="post-activity" />
+                	</panel>
+              	</panel>
+              	<panel name="kb-filler" width="100%" height="216" lheight="162"></panel>
+              </pager>
+              
+            </panel>
+  <!-- 
+      assessment view / triggered off the assesment link located in call-to-action of journal/main/call-to-action 
+  -->
+            <panel name="assessment" width="100%" height="[object:HOME.height]" ypos="100%" background="#ffffff">
+              <panel name="steps" height="44" width="100%" background="#819bad" padding-left="10" padding-right="10" valign="bottom">
+                <image name="btn-prev" source="graphics/btn-previous.png" alpha="0" valign="center" onclickup="step-assess" _pager="HOME/assessment/main">
+                  <text name="label" height="100%" width="85%" align="right" text="previous" style="step-label" />
+                </image>
+                <text name="label" alias="ASSESSSTEPS" height="100%" width="33.3%" text="1 of 3" align="center" size="12" alignment="center" color="#ffffff"/>
+                <image name="btn-next" source="graphics/btn-next.png" alpha="1" align="right" valign="center" onclickup="step-assess" _pager="HOME/assessment/main">
+                  <text name="label" height="100%" width="85%" text="next" style="step-label" />
+                </image>
+              </panel>
+              <pager name="main" height="[eval: [object:HOME/assessment.height] - [object:HOME/assessment/steps.height]]" width="100%" orientation="horizontal" paginate="yes">
+                <panel name="1" height="100%" width="90%" align="center" valign="center" onscrollto="step-buttons-assessment" _aliasTarget="HOME/assessment">
+                  <text name="question" height="88" width="100%" style="headline" text="Are you having little interest or pleasure in doing things?" alignment="center" align="center" valignment="top" padding-top="10"/>
+                  <pager name="answers" width="100%" height="[eval: [object:HOME/assessment.height] - [object:HOME/assessment/steps.height] - [object:HOME/assessment/main/1/question.height]]" orientation="vertical" paginate="no" valign="bottom">
+                    <panel name="row-1" width="100%" height="20%">
+                      <object class="button" text="Yes" onclickup="null" />
+                    </panel>
+                    <panel name="row-2" width="100%" height="20%">
+                      <object class="button" text="No" onclickup="null" />
+                    </panel>
+                  </pager>
+                </panel>
+                <panel name="2" height="100%" width="90%" align="center" valign="center" onscrollto="step-buttons-assessment" _aliasTarget="HOME/assessment">
+                	<text name="question" height="88" width="100%" style="headline" text="Are you feeling down, depressed, or hopeless?" alignment="center" align="center" valignment="top" padding-top="10"/>
+                  <pager name="answers" width="100%" height="[eval: [object:HOME/assessment.height] - [object:HOME/assessment/steps.height] - [object:HOME/assessment/main/1/question.height]]" orientation="vertical" paginate="no" valign="bottom">
+                    <panel name="row-1" width="100%" height="20%">
+                      <object class="button" text="Yes" onclickup="null" />
+                    </panel>
+                    <panel name="row-2" width="100%" height="20%">
+                      <object class="button" text="No" onclickup="null" />
+                    </panel>
+                  </pager>
+                </panel>
+                <panel name="3" height="100%" width="100%" align="center" valign="center" onscrollto="step-buttons-assessment" _aliasTarget="HOME/assessment">
+                   <text name="apply" height="44" width="100%" style="headline" text="This questionnaire assesses your sleep quality. \n\n Tap statements below that apply" alignment="center" align="center" valignment="top" padding-top="10"/>
+                   <panel name="break" width="100%" height="2" background="666666" bottomof="apply"></panel>
+				           <pager name="sleep-pager" alias="SLEEP-PAGER"  width="90%" height="[eval: [object:HOME/assessment.height] - [object:HOME/assessment/steps.height] - [object:HOME/assessment/main/3/apply.height] - [object:HOME/assessment/main/3/break.height] ]" orientation="vertical" align="center" paginate="no" topof="HOME/assessment/steps">                 
+                      <object class="sleep-item" item="1" sleeptext="I feel sleepy during the day, even when I get a good night’s sleep" />
+                      <object class="sleep-item" item="2" sleeptext="I get very irritable when I can’t sleep" />
+                      <object class="sleep-item" item="3" sleeptext="I often wake up at night and have trouble falling back to sleep" />
+                      <object class="sleep-item" item="4" sleeptext="It usually takes me a long time to fall asleep" />
+                      <object class="sleep-item" item="5" sleeptext="I often wake up very early and can’t fall back to sleep" />
+                      <object class="sleep-item" item="6" sleeptext="I usually feel achy and stiff when I wake up in the morning" />
+                      <object class="sleep-item" item="7" sleeptext="I often seem to wake up because of dreams" />
+                      <object class="sleep-item" item="8" sleeptext="I sometimes wake up gasping for breath" />
+                      <object class="sleep-item" item="9" sleeptext="My bed partner says my snoring keeps her/him from sleeping" />
+                      <object class="sleep-item" item="10" sleeptext="I’ve fallen asleep driving" />
+                  </pager> 
+                </panel>
+              </pager>
+            </panel>
+           <!-- 
+           history view / triggered off the toolbar button in upper right 
+           -->
+            <panel name="history" width="100%" height="[object:HOME.height]" ypos="100%" background="#ffffff">
+              <panel name="datebar" height="44" width="100%" background="#819bad">
+                <text name="label" height="100%" width="100%" font="HelveticaNeue" text=" " color="#efefef" size="15" alignment="center"/>
+              </panel>
+              <list name="main" height="[eval:[object:HOME.height] - [object:HOME/history/datebar.height] ]" datasource="ActivityGet" valign="bottom" width="100%" orientation="vertical" paginate="no">
+                <object class="history-row" index="[param:datasourceIndex]" title="[param:content]" moodnum="[param:mood/level]" date="[eval: new Date('[eval: '[param:created]'.replace('+0000','')]').toLocaleDateString()]" lhs="[param:datasourceIndex]" operator="lte" rhs="30"/>
+              </list>
+            </panel>
+          </panel>
+          <!-- 
+          Inspiration Screen
+          -->
+          <panel name="Inspiration" alias="INSPIRATION" width="100%" height="[eval: [object:WRAPPER.height] - [object:TOOLBAR.height]]" bottomof="toolbar" xpos="100%">
+            <!--<panel name="controls" height="44" width="100%" background="#c1c1c1">
+              <image name="clip" source="graphics/icon-top-attach.png" align="right" valign="center" onclickup="choose-inspiration-attachment"></image>
+            </panel>
+            <panel name="calltoaction" height="88" width="100%" valign="bottom" background="#bab8b8">
+              <object class="button" text="What I Live For" onclickup="null" />
+            </panel>-->
+            <panel name="main" height="100%" width="100%" background="#000000">
+              <panel name="quad-UL" height="50%" width="50%" onclickup="add-feature">
+                <panel name="icon" height="50%" width="90%" align="center" valign="center" borderwidth="5" bordercolor="ffffff" background="#111111" />
+                <text name="label" ypos="75%" height="10%" width="100%" font="HelveticaNeue-Bold" color="ffffff" text="Photos" size="15" alignment="center" bottomof="icon"/>
+              </panel>
+              <panel name="quad-UR" xpos="50%" height="50%" width="50%" onclickup="lost">
+				<panel name="icon" height="50%" width="90%" align="center" valign="center" borderwidth="5" bordercolor="ffffff" background="#111111" />
+                <text name="label" ypos="75%" height="10%" width="100%" font="HelveticaNeue-Bold" color="ffffff" text="Locations" size="15" alignment="center" bottomof="icon"/>
+              </panel>
+              <panel name="quad-LL" ypos="40%" height="50%" width="50%"  onclickup="lost">
+		        <panel name="icon" height="50%" width="90%" align="center" valign="center" borderwidth="5" bordercolor="ffffff" background="#111111" />
+        	    <text name="label" ypos="75%" height="10%" width="100%" font="HelveticaNeue-Bold" color="ffffff" text="Quotes" size="15" alignment="center" bottomof="icon"/>
+              </panel>
+              <panel name="quad-LR" xpos="50%" ypos="40%" height="50%" width="50%" onclickup="lost">
+				<panel name="icon" height="50%" width="90%" align="center" valign="center" borderwidth="5" bordercolor="ffffff" background="#111111" />
+                <text name="label" ypos="75%" height="10%" width="100%" font="HelveticaNeue-Bold" color="ffffff" text="Other" size="15" alignment="center" bottomof="icon"/>
+              </panel>
+            </panel>
+          </panel>
+          <panel name="addInspire" alias="ADDINSPIRE" width="100%" height="100%" alpha="0">
+          <panel name="curtain" width="100%" height="100%" background="#000000" alpha=".8" onclickup="close-inspiration-attachment"></panel>
+          <panel name="button-container" width="100%" height="100%" valign="center">
+            <panel name="1" width="100%" height="15%" ypos="15%">
+              <object class="buttonWithIcon" text="Add Photo from Camera" cam="camera" icon="icon-btn-camera.png" onclickup="show-camera" />
+            </panel>
+            <panel name="2" width="100%" height="15%" bottomof="1">
+              <object class="buttonWithIcon" text="Add Photo from Gallery" cam="roll" icon="icon-btn-grid.png" onclickup="show-camera" />
+            </panel>
+            <panel name="3" width="100%" height="15%" bottomof="2">
+              <object class="buttonWithIcon" text="Add Location" cam="" icon="icon-entry-locator.png" onclickup="attach-inspire" />
+            </panel>
+            <panel name="4" width="100%" height="15%" bottomof="3">
+              <object class="buttonWithIcon" text="Add Quote" cam="" icon="icon-btn-quote.png" onclickup="attach-inspire" />
+            </panel>
+            <panel name="5" width="100%" height="15%" bottomof="4">
+              <object class="buttonWithIcon" text="Add Other" cam="" icon="icon-btn-internet.png" onclickup="attach-inspire" />
+            </panel>
+          </panel>
+        </panel>	
+          <!-- 
+          care team entry screen 
+          -->
+          <panel name="Care Team" alias="CARETEAM" width="100%" height="[eval: [object:WRAPPER.height] - [object:TOOLBAR.height]]" bottomof="toolbar" xpos="100%">
+            <panel name="controls" height="44" width="100%" background="#c1c1c1">
+              <text name="support" height="100%" width="33.33%" text="Support Team" font="helvetica" size="12" alignment="center" state="active" background="#a6a6a6" onclickup="toggle-view"/>
+              <text name="clinical" height="100%" width="33.33%" text="Clinical Team" font="helvetica" size="12" alignment="center" align="center" onclickup="toggle-view" />
+              <text name="urgent" height="100%" width="33.33%" text="Urgent Team" font="helvetica" size="12" alignment="center" align="right" onclickup="toggle-view"/>
+            </panel>
+            <pager name="contact-list" width="100%" height="[eval: [object:CARETEAM.height] - 42]" topmargin="5" orientation="vertical" paginate="no" bottomof="controls" background="e1e1e1">
+                 <object class="contact-item" contact-item="1" contact-image="graphics/img-contact-male.png" name="John Hancock" description="father" />
+                 <object class="contact-item" contact-item="2" contact-image="graphics/img-contact-female.png" name="Sample Female" description="mother" />
+                 <object class="contact-item" contact-item="3" contact-image="graphics/img-contact-male.png" name="John Hancock" description="father" />
+                 <object class="contact-item" contact-item="4" contact-image="graphics/img-contact-male.png" name="John Hancock" description="father" />
+            </pager> 
+          </panel>
+          <!-- 
+          COPING TECHNIQUES Screen
+          -->
+          <panel name="Coping Techniques" alias="COPINGTECHNIQUES" width="100%" height="[eval: [object:WRAPPER.height] - [object:TOOLBAR.height]]" bottomof="toolbar" xpos="100%" background="#ffffff">
+            <panel name="calltoaction" height="120" width="100%" valign="bottom">
+             <!--
+ <text name="addtoInspiration" height="44" width="70%" font="HelveticaNeue" color="#000000" size="15" alignment="center" align="center" leftinset="40" text="Add to inspiration feed" >
+                <panel name="checkbox" width="30" height="30" valign="center" background="#e9e9e9" bordercolor="#222222" borderwidth="1"></panel>
+              </text>
+              <panel name="button-container" width="100%" height="66" valign="bottom">
+                <object class="button" text="Makes Me Feel Better" onclickup="null" />
+              </panel>
+-->
+            </panel>
+            <panel name="controls" height="44" width="100%" background="#819bad">
+              <text name="physical" height="100%" width="33.33%" text="Physical" color="#ffffff" font="helvetica" size="13" alignment="center" state="active" background="#6d8693" onclickup="toggle-view" _type="Physical"/>
+              <text name="mental" height="100%" width="33.33%" text="Mental" color="#ffffff" font="helvetica" size="13" alignment="center" align="center" onclickup="toggle-view" _type="Mental"/>
+              <text name="spiritual" height="100%" width="33.33%" text="Spiritual" color="#ffffff" font="helvetica" size="13" alignment="center" align="right" onclickup="toggle-view" _type="Spiritual"/>
+            </panel>
+            <panel name="main" height="[eval: [object:COPINGTECHNIQUES.height] - [object:COPINGTECHNIQUES/calltoaction.height] - [object:COPINGTECHNIQUES/controls.height]]" ypos="[object:COPINGTECHNIQUES/controls.height]" width="100%" background="#ffffff">
+             
+                <list name="physical-list" alias="PLIST" height="[eval:[object:COPINGTECHNIQUES/main.height]- 44]" datasource="saved-coping" width="100%" orientation="horiztonal" paginate="yes" alpha="0">
+                  <object class="coping-item" source="[param:photo]" text="[param:text]" item="[param:dataSourceIndex]" lhs="[param:type]" operator="e" rhs="physical"/>
+                </list>
+                <list name="mental-list" alias="MLIST" height="[eval:[object:COPINGTECHNIQUES/main.height]- 44]" datasource="saved-coping" width="100%" orientation="horiztonal" paginate="yes" alpha="0">
+                  <object class="coping-item" source="[param:photo]" text="[param:text]" item="[param:dataSourceIndex]" lhs="[param:type]" operator="e" rhs="mental"/>
+                </list>
+                <list name="spiritual-list" alias="SLIST" height="[eval:[object:COPINGTECHNIQUES/main.height]- 44]" datasource="saved-coping" width="100%" orientation="horiztonal" paginate="yes"  alpha="0">
+                  <object class="coping-item" source="[param:photo]" text="[param:text]" item="[param:dataSourceIndex]" lhs="[param:type]" operator="e" rhs="spiritual"/>
+                </list>
+                 <!-- 
+                 classify these items below 
+              -->
+                <panel name="dots" height="44" width="60" bottomof="physical-list" align="center">
+                  <panel name="pg1" width="20" height="10" state="active">
+                    <panel name="dot" width="10" height="10" background="#8fbf6b" state="active" cornerradius="5" align="center" borderwidth="1" bordercolor="#b4b4b6" />
+                  </panel>
+                  <panel name="pg2" width="20" height="10" rightof="pg1" >
+                    <panel name="dot" width="10" height="10" background="#ffffff" cornerradius="5" align="center" borderwidth="1" bordercolor="#b4b4b6" />
+                  </panel>
+                  <panel name="pg3" width="20" height="10" rightof="pg2" >
+                    <panel name="dot" width="10" height="10" background="#ffffff" cornerradius="5" align="center" borderwidth="1" bordercolor="#b4b4b6" />
+                  </panel>
+                  <panel name="pg4" width="20" height="10" rightof="pg3" >
+                    <panel name="dot" width="10" height="10" background="#ffffff" cornerradius="5" align="center" borderwidth="1" bordercolor="#b4b4b6" />
+                  </panel>
+                </panel>
+            </panel>
+          </panel>
+          
+			<!-- 
+          !Safety Plan Screen
+          -->
+			<panel name="Safety Plan" alias="SAFETYPLAN" width="100%" height="[eval: [object:WRAPPER.height] - [object:TOOLBAR.height]]" bottomof="toolbar" xpos="100%">
+				<panel name="top" height="44" width="100%" background="#819bad" padding-left="10" padding-right="10">
+					<text name="label" height="100%" width="80%" text="1 of 5: Warning Signs" align="center" size="12" alignment="center" color="#ffffff" />
+				</panel>
+				<panel name="steps" height="44" valign="bottom" width="100%" background="#126f93">
+					<image name="btn-prev" source="graphics/btn-previous.png" alpha="0" valign="center" onclickup="step" _pager="SAFETYPLAN/main">
+						<text name="label" height="100%" width="85%" align="right" text="previous" style="step-label" />
+					</image>
+					<image name="btn-next" source="graphics/btn-next.png" alpha="1" align="right" valign="center" onclickup="step" _pager="SAFETYPLAN/main">
+						<text name="label" height="100%" width="85%" text="next" style="step-label" />
+					</image>
+				</panel>
+				<pager name="main" ypos="[object:SAFETYPLAN/steps.height]" height="[eval: [object:SAFETYPLAN.height] - [object:SAFETYPLAN/steps.height] - [object:SAFETYPLAN/top.height]]" width="100%" background="#bab8b8" orientation="horizontal" paginate="yes">
+					<panel name="1" height="100%" width="100%" align="center" valign="center" background="#ffffff" onscrollto="step-buttons" _aliasTarget="SAFETYPLAN" _colon=": Warning Signs">
+						<text name="query" height="54" width="100%" align="left" text="What are the warning signs that a crisis may be developing for you?" style="step-question" />
+						<panel name="add-warning" height="50" width="100%" bottomof="query" background="#ffffff">
+							<object class="button" text="Add Warning Sign" onclickup="add-plan-item" />
+							<panel name="break" width="100%" height="2" background="666666" topmargin="5" bottomof="button" />
+						</panel>
+						<list name="pager" alias="WARNINGPAGER" datasource="saved-warning" align="center" width="100%" height="100%" orientation="vertical" paginate="no" bottomof="add-warning" padding-left="10" padding-right="10" topmargin="15" >
+							<object class="remove-item" textfield="warn-entry1" index="[param:dataSourceIndex]" removetext="[param:LABEL]" id="[param:ID]" />
+						</list>
+					</panel>
+					<panel name="2" height="100%" width="100%" align="center" valign="center" background="#ffffff" onscrollto="step-buttons" _aliasTarget="SAFETYPLAN" _colon=": Inspiration">
+						<text name="query" height="54" width="100%" align="left" text="What helps you take your mind off of your problems?" style="step-question" />
+						<panel name="add-inspiration" height="50" width="100%" bottomof="query" background="#ffffff">
+							<object class="button" text="Add Inspiration" onclickup="add-plan-item" />
+							<panel name="break" width="100%" height="2" background="666666" topmargin="5" bottomof="button" />
+						</panel>
+						<list name="pager" alias="INSPIRATIONPAGER" datasource="saved-inspiration" align="center" width="100%" height="100%" orientation="vertical" paginate="no" bottomof="add-inspiration" padding-left="10" padding-right="10" topmargin="15" >
+							<object class="remove-item" textfield="inspiration-entry1" index="[param:dataSourceIndex]" removetext="[param:LABEL]" id="[param:ID]" />
+						</list>
+					</panel>
+					<panel name="3" alias="CONTACT" height="100%" width="100%" align="center" valign="center" background="#ffffff" onscrollto="step-buttons" _aliasTarget="SAFETYPLAN" _colon=": Care Team">
+						<text name="contact-text" height="34" width="85%" align="center" text="Who keeps you safe?" style="step-question" />
+						<panel name="add-contact" height="50" width="100%" bottomof="contact-text" background="#ffffff">
+							<object class="button" text="Add Contact" onclickup="add-contact" />
+							<panel name="break" width="100%" height="2" background="666666" topmargin="5" bottomof="button" />
+						</panel>
+						<pager name="contact-list" width="100%" height="[eval: [object:CONTACT.height] - 100]" topmargin="5" orientation="vertical" paginate="no" bottomof="add-contact">
+						</pager>
+					</panel>
+					<panel name="4" height="100%" width="100%" align="center" valign="center" background="#ffffff" onscrollto="step-buttons" _aliasTarget="SAFETYPLAN" _colon=": Coping Techniques">
+						<panel name="coping-controls" height="44" width="100%" background="#819bad">
+							<text name="support" height="100%" width="33.33%" text="Physical" _type="Physical" font="helvetica" size="12" alignment="center" state="active" background="#6d8693" onclickup="toggle-view" />
+							<text name="clinical" height="100%" width="33.33%" text="Mental" _type="Mental" font="helvetica" size="12" alignment="center" align="center" onclickup="toggle-view" />
+							<text name="urgent" height="100%" width="33.33%" text="Spiritual" _type="Spiritual" font="helvetica" size="12" alignment="center" align="right" onclickup="toggle-view" />
+						</panel>
+						<text name="cope-text" height="44" width="87%" align="center" text="Techniques and activities that help you cope with difficult situations or emotions." bottomof="coping-controls" style="step-question" />
+						<pager name="coping-options-physical" alias="PHYSICAL" width="100%" height="[eval: [object:CONTACT.height] - 88]" bottomof="cope-text" orientation="vertical" paginate="no">
+							<object class="coping-row" label="Go for a walk/run/swim" photo="images/walk.jpg" nodeID="1" type="physical" />
+							<object class="coping-row" label="Play a game" photo="images/game2.jpg" nodeID="2" type="physical" />
+							<object class="coping-row" label="Call a support person" photo="images/call.jpg" nodeID="3" type="physical" />
+							<object class="coping-row" label="Lift weights" photo="images/weights.jpg" nodeID="4" type="physical" />
+							<object class="coping-row" label="Clean Your Room" photo="images/clean.jpg" nodeID="5" type="physical" />
+							<object class="add-coping-row" textfield="cope-entry1" type="physical" />
+						</pager>
+						<pager name="coping-options-mental" alias="MENTAL" width="100%" height="[eval: [object:CONTACT.height] - 88]" bottomof="cope-text" orientation="vertical" paginate="no" alpha="0">
+							<object class="coping-row" label="Read a book" photo="images/book.jpg" nodeID="6" type="mental" />
+							<object class="coping-row" label="Perform deep breathing exercises" photo="images/breathing.jpg" nodeID="7" type="mental" />
+							<object class="coping-row" label="Spend time with family or friends" photo="images/friends.jpg" nodeID="8" type="mental" />
+							<object class="coping-row" label="Listen to music" photo="images/music.jpg" nodeID="9" type="mental" />
+							<object class="coping-row" label="Make time for doing artwork,puzzles or games" photo="images/game.jpg" nodeID="10" type="mental" />
+							<object class="add-coping-row" textfield="cope-entry1" type="mental" />
+						</pager>
+						<pager name="coping-options-spiritual" alias="SPIRITUAL" width="100%" height="[eval: [object:CONTACT.height] - 88]" bottomof="cope-text" orientation="vertical" paginate="no" alpha="0">
+							<object class="coping-row" label="Engage with others in spiritual expression" photo="images/church.jpg" nodeID="11" type="spiritual" />
+							<object class="coping-row" label="Release anger for things you can't control" photo="images/control.jpg" nodeID="12" type="spiritual" />
+							<object class="coping-row" label="Participate in activity to help others" photo="images/charity.jpg" nodeID="13" type="spiritual" />
+							<object class="coping-row" label="Attend a meeting with like-minded people" photo="images/friends.jpg" nodeID="14" type="spiritual" />
+							<object class="coping-row" label="Do yoga or meditate" photo="images/yoga.jpg" nodeID="15" type="spiritual" />
+							<object class="add-coping-row" textfield="cope-entry1" type="spiritual" />
+						</pager>
+					</panel>
+					<panel name="5" height="100%" width="100%" align="center" valign="center" background="#ffffff" onscrollto="step-buttons" _aliasTarget="SAFETYPLAN" _colon=": Safe Environment">
+						<text name="query" height="64" width="86%" align="center" text="What have you done or will do to make your environment safe for you?" style="step-question" />
+						<panel name="add-environment" height="50" width="100%" bottomof="query" background="#ffffff">
+							<object class="button" text="Add Environment" onclickup="add-environment-item" />
+							<panel name="break" width="100%" height="2" background="666666" topmargin="5" bottomof="button" />
+						</panel>
+						<list name="environment" width="100%" height="100%" datasource="saved-environment" orientation="vertical" bottomof="add-environment" paginate="no" padding-left="10" padding-right="10" topmargin="15" >
+							<object class="remove-environment" textfield="environment-entry1" index="[param:dataSourceIndex]" removetext="[param:LABEL]" id="[param:ID]" />
+						</list>
+						<panel name="col2" width="40%" height="60" align="right" valign="bottom" bottom-margin="20" >
+							<object class="button" text="Save" onclickup="prep-inspiration-vars" />
+						</panel>
+					</panel>
+				</pager>
+				<panel name="planItem" alias="PLAN-ITEM" width="100%" height="100%" alpha="0" >
+					<panel name="bg" width="100%" height="100%" background="#000000" alpha=".5" ></panel>
+					<panel name="container" width="90%" height="70%" align="center" valign="center" background="#ffffff" >
+						<object class="add-item" item-alias="PLAN-ITEM" textfield="inspire-entry1" add-notes="inspire-note1" dropdown="inspirations.xml" index="1" label="" type="Type" notes="" />
+					</panel>
+				</panel>
+				<panel name="environmentItem" alias="ENVIRONMENT-ITEM" width="100%" height="100%" alpha="0" >
+					<panel name="bg" width="100%" height="100%" background="#000000" alpha=".5" ></panel>
+					<panel name="container" width="90%" height="70%" align="center" valign="center" background="#ffffff" >
+						<object class="add-environment" item-alias="ENVIRONMENT-ITEM" textfield="environment-label" add-notes="inspire-note1" dropdown="inspirations.xml" index="1" label="" type="Type" notes="" />
+					</panel>
+				</panel>
+			</panel>
+          <!-- 
+          Treatment Locator Screen
+          -->
+          <panel name="Treatment Locator" alias="TREATMENTLOCATOR" width="100%" height="[eval: [object:WRAPPER.height] - [object:TOOLBAR.height]]" bottomof="toolbar" xpos="100%">
+            <panel name="search" height="44" width="100%" background="#819bad">
+              <textfield name="searchField" width="80%" height="34" font="HelveticaNeue" size="15" color="#111111" alignment="left" leftinset="50" onreturnkeypressed="dismiss-keyboard" padding-left="10" padding-right="10" valign="center" xpos="10" valignment="center" border="none" background="#ffffff" cornerradius="17" placeholder="search">
+              <image name="search" source="graphics/icon.find.png" valign="center" align="left"></image>
+              <image name="clear" source="graphics/icon.delete.png" valign="center" align="right"></image>
+              </textfield>
+              <text name="maplist" alias="MAPLIST" width="20%" height="100%" color="#ffffff" font="HelveticaNeue" size="16" alignment="right" text="List" align="right" margin="10" onclickup="show-maplist"></text>
+            </panel> 
+            <map name="main" alias="MAP" datasource="locator" height="[eval:[object:TREATMENTLOCATOR.height]-[object:TREATMENTLOCATOR/search.height]]" width="100%" type="map" currentlocation="yes" showuser="yes" valign="bottom">
+              <object name="pin" class="annotations" dataSourceIndex="[param:dataSourceIndex]" location="[param:LOC_LAT] [param:LOC_LONG]" title="[param:ORG_NAME]" subtitle="[param:LOC_STREET_1] [param:LOC_CITY] [param:LOC_STATE] [param:LOC_ZIP]" phone="[param:PHONE_NUMBER]" />
+            </map>
+            <panel name="establishmentList" alias="ESTABLISHMENTLIST-CONTAINER" width="100%" height="[eval:[object:TREATMENTLOCATOR.height]-[object:TREATMENTLOCATOR/search.height]]" valign="bottom" background="e1e1e1" clip="yes" alpha="0">
+	        			<panel name="header" width="90%" height="7.7%" align="center">
+			        		<text name="title" width="100%" height="100%" color="#666666" font="HelveticaNeue" size="24" rightof="back" alignment="left" text="Locations"></text>
+		        		</panel>
+            			<list name="establishments"  alias="ESTABLISHMENT-LIST" width="100%" height="92.2%"  datasource="locator" orientation="vertical" paginate="no" align="center" valign="bottom">
+                 			 <object class="establishmentList" index="[param:dataSourceIndex]" name="[param:ORG_NAME]" coords="[param:LOC_LAT] [param:LOC_LONG]" address1="[param:LOC_STREET_1]" address2="[param:LOC_CITY], [param:LOC_STATE]" phone="[param:PHONE_NUMBER]"/>
+		    			</list>
+		    </panel>			
+          </panel>
+          <!-- 
+          Settings/Profile Screen
+          -->
+          <panel name="Settings" alias="SETTINGS" width="100%" height="[eval: [object:WRAPPER.height] - [object:TOOLBAR.height]]" bottomof="toolbar" xpos="100%">
+            <pager name="main" height="100%" width="100%" background="#e1e1e1" orientation="vertical" paginate="no">
+              <panel name="row-1" width="100%" height="22">
+                <text name="label" height="100%" width="100%" text="" font="HelveticaNeue" color="#000000" size="13" alignment="center" />
+              </panel>
+              <panel name="row-2" width="100%" height="64">
+                <textfield name="firstName" height="44" width="80%" placeholder="first name" style="textfield" align="center" margin-top="0" />
+              </panel>
+              <panel name="row-3" width="100%" height="64">
+                <textfield name="lastName" height="44" width="80%" placeholder="last name" style="textfield" align="center" margin-top="0"/>
+              </panel>
+              <panel name="row-4" width="100%" height="64">
+                <textfield name="email" height="44" width="80%" placeholder="email" style="textfield" align="center" margin-top="0"/>
+              </panel>
+              <panel name="row-5" width="100%" height="64">
+                <textfield name="password" height="44" width="80%" placeholder="password" password="yes" style="textfield" align="center" margin-top="0"/>
+              </panel>
+              <panel name="row-6" width="100%" height="64">
+                <textfield name="repeatpassword" height="44" width="80%" placeholder="password" password="yes" style="textfield" align="center" margin-top="0"/>
+              </panel>
+              <panel name="row-7" width="100%" height="64">
+                <object class="button" text="Save" onclickup="null" />
+              </panel>
+              <panel name="kb-filler" width="100%" height="216" lheight="162"></panel>
+            </pager>
+          </panel>
+
+          <panel name="curtain" alias="CURTAIN" width="100%" height="100%" background="#222222" alpha="0" onclickup="toggle-toc"></panel>
+        </panel>
+        		<!-- !Contacts -->
+		<panel name="contacts" alias="CONTACTS" width="100%" height="100%" alpha="0">
+			<list name="list" width="100%" height="100%" datasource="contacts" orientation="vertical" paginate="no" background="#ffffff">
+				<object class="contact-item-ds" contact-item="[param:dataSourceIndex]" contact-image="[param:image]" name="[param:firstname] [param:lastname]" description="father" />
+			</list>
+			<panel name="contacts-info" alias="CONTACT-INFO" width="100%" height="100%" alpha="0" >
+				<panel name="bg" width="100%" height="100%" background="#000000" alpha=".5" ></panel>
+				<panel name="options" width="85%" height="85%" align="center" valign="center" background="ffffff" >
+					<text name="title" height="34" width="100%" align="center" text="Who keeps you safe?" style="step-label" />
+					<text name="contact-type" height="35" width="100%" align="center" bottomof="title" text="What kind of contact is this?" style="step-question" />
+					<panel name="col1" width="40%" height="60" align="center" bottomof="contact-type" >
+						<object class="button" text="Personal" onclickup="select-contact-type" />
+					</panel>
+					<panel name="col2" width="40%" height="60" align="center" bottomof="col1" >
+						<object class="button" text="Clinical" onclickup="select-contact-type" />
+					</panel>
+					<panel name="col3" width="40%" height="60" align="center" bottomof="col2" >
+						<object class="button" text="Facility" onclickup="select-contact-type" />
+					</panel>
+					<panel name="checkbox" width="30" height="30" xpos="10" bottomof="col3" bordercolor="#222222" borderwidth="1" onclickup="allow-message-contact" />
+					<text name="contact-type" height="fit" width="80%" bottomof="col3" rightof="checkbox" text="This contact can receive messages" style="step-question" />
+				</panel>
+			</panel>
+		</panel>
+		<!-- !DropDowns -->
+		<panel name="dropdown" alias="DROPDOWN" width="100%" height="100%" alpha="0">
+			<list name="list" width="100%" height="100%" datasource="dropdowns" orientation="vertical" paginate="no" background="#ffffff">
+				<object class="dropdown-item" dropdown-item="[param:dataSourceIndex]" text="[param:text]" />
+			</list>
+		</panel>
+
+        
+	<!-- 
+	Camera 
+	-->
+   		<panel name="camera" alias="CAMERA" width="100%" height="[eval: [object:WRAPPER.height] - [object:TOOLBAR.height]]" alpha="0" bottomof="TOOLBAR" xpos="100%">
+   			<panel name="lens" width="100%" height="100%" background="000000">
+   				<panel name="photo" width="100%" height="100%">
+                      <panel name="box" width="100%" height="100%" ypos="0" >
+                            <image name="asset" width="135%" url="" alpha="0" align="center" valign="center" ></image>
+                      </panel>
+   				</panel>
+   				<!--<panel name="crop1" width="100%" height="[eval: [object:WRAPPER.height] == 480 ? 35:69]" background="2c3e50" alpha=".5"></panel>
+   				<panel name="crop2" width="100%" height="[eval: [object:WRAPPER] == 480 ? 35:69]" background="2c3e50" valign="bottom" alpha=".5"></panel>-->
+   			</panel>
+   			<panel name="toolbar" width="100%" height="110" valign="bottom">
+   				<panel name="bg" width="100%" height="90" background="333333" valign="bottom"></panel>
+   				<panel name="shutter" width="110" height="110" cornerradius="55" align="center" background="222222" onclickup="take-photo" >
+   					<panel name="dark" width="90" height="90" cornerradius="45" align="center" valign="center" background="666666">
+	   					<panel name="button" width="50" height="50" cornerradius="25" align="center" valign="center" background="000000" shadowradius="2" shadowopacity=".2" shadowyoffset="2" shadowxoffset="0">
+	   						<image name="cam" align="center" valign="center" source="graphics/icon-camera.png"></image>
+	   					</panel>   						
+   					</panel>
+   				</panel>
+   				<image name="flip" source="graphics/icon-camera-flip.png" ypos="44%" xpos="40" onclickup="camera-flip"></image>
+   				<panel name="button-save" width="10%" height="25%" ypos="47%" xpos="70%" background="666666">
+   					<image name="save" source="graphics/icon-accept.png" onclickup="commit-photo" align="center" valign="center"></image>
+   				</panel>
+   				<panel name="button-back" width="10%" height="25%" ypos="47%" xpos="85%" background="666666">
+   					<image name="back" source="graphics/icon-cancel.png" onclickup="hide-camera" align="center" valign="center"></image>
+   				</panel>
+   				
+   			</panel>
+   		</panel>
+   		<panel name="camera" alias="CAMERA-ROLL" width="100%" height="[eval: [object:WRAPPER.height] - [object:TOOLBAR.height]]" alpha="0" xpos="100%" bottomof="TOOLBAR" background="000000">
+   		</panel>
+   		<panel name="photoLoad-wait" alias="ROLL-WAIT" width="100%" height="60" ypos="100%" >
+			<panel name="bg" width="100%" height="100%" background="2c3e50" alpha=".8"></panel>
+			<wait name="wait" width="60" height="100%" xpos="18%"></wait>
+			<text name="text" width="60%" height="100%" color="#ffffff" font="Avenir-Medium" size="16" rightof="wait" leftmargin="10" alignment="left" text="Loading Photos..."></text>
+   		</panel>
+    		
+        
+        
+        <!-- 
+          Welcome Screen
+          -->
+        <panel name="welcome" alias="WELCOME" width="100%" height="100%" background="#e1e1e1">
+          <text name="intro" height="44" width="100%" text="Welcome" font="HelveticaNeue-Bold" size="15" alignment="center" margin-top="10" />
+          <panel name="signIn" width="100%" height="100%" bottomof="intro" background="#e1e1e1">
+            <textfield name="email" alias="EMAIL" height="44" width="80%" placeholder="email" bottomof="welcome" align="center" style="textfield" text="J" />
+            <textfield name="password" alias="PASSWORD" height="44" width="80%" placeholder="password" bottomof="email" align="center" password="yes" style="textfield" text="q" />
+            <text name="button" height="44" width="80%" text="Sign In" font="HelveticaNeue"  size="15" alignment="center" bottomof="password" margin-top="10" background="#ff0000" onclickup="signIn" align="center"/>
+            <text name="label" height="44" width="100%" text="Need an Account?" font="HelveticaNeue" color="#000000" size="13" alignment="center" bottomof="button" margin-top="10" onclickup="toggle-signUp" />
+          </panel>
+          <panel name="signUp" width="100%" height="100%" ottomof="intro" xpos="100%" bottomof="intro" background="#e1e1e1">
+            <textfield name="email" alias="NEWEMAIL" height="44" width="80%" placeholder="email" bottomof="welcome" style="textfield" align="center" />
+            <textfield name="password" alias="NEWPASSWORD" height="44" width="80%" placeholder="password" bottomof="email" password="yes" style="textfield" align="center" />
+            <textfield name="firstName" alias="FIRSTNAME" height="44" width="80%" placeholder="first name" bottomof="password" style="textfield" align="center" />
+            <textfield name="lastName" alias="LASTNAME" height="44" width="80%" placeholder="last name" bottomof="firstName" style="textfield" align="center" />
+            <text name="button" height="44" width="80%" text="Sign Up" font="HelveticaNeue"  size="15" alignment="center" bottomof="lastName" margin-top="10" background="#ff0000" onclickup="signUp" align="center"/>
+            <text name="label" height="44" width="100%" text="Have an Account?" font="HelveticaNeue" color="#000000" size="13" alignment="center" bottomof="button" margin-top="10" onclickup="toggle-signUp" />
+          </panel>
+        </panel>
+        <!-- 
+          Today Screen
+          -->
+        <panel name="todayModal" alias="TODAYMODAL" width="100%" height="100%" alpha="0">
+          <panel name="curtain" width="100%" height="100%" background="#000000" alpha=".8"></panel>
+          <text name="headline" height="33%" width="100%" font="HelveticaNeue-Bold" size="30" alignment="center" color="#8fbf6b" text="How are you today?" />
+          <panel name="button-container" width="100%" height="33.3%" valign="center">
+            <panel name="1" width="100%" height="33.3%">
+              <object class="buttonWithIcon" text="Call the Hotline" icon="icon-entry-hotline.png" onclickup="call-hotline" />
+            </panel>
+            <panel name="2" width="100%" height="33.3%" valign="center">
+              <object class="buttonWithIcon" text="Find a Treatment Location" icon="icon-entry-locator.png" onclickup="reveal-location" />
+            </panel>
+            <panel name="3" width="100%" height="33.3%" valign="bottom">
+              <object class="buttonWithIcon" text="Continue" icon="icon-entry-continue.png" onclickup="dismiss-today-modal" />
+            </panel>
+          </panel>
+        </panel>
+    </panel> 
+    <web name="web" alias="WEB" width="1" height="1" url="about:blank" alpha="0"></web>
+  </main>
+  <actions>
+    <action name="boot" oninit="yes">
+			<assign property="var:contactCount" value="1" />
+			<assign property="var:activeStep" value="1" />
+      <assign property="object:WRAPPER/toolbar/label.text" value="Hello" />
+      <assign property="var:currentSection" value="Home" />
+      <assign property="datasource:PushRegister.source" value="https://go.urbanairship.com/api/device_tokens/[system:pushtoken]"/>
+      <assign property="var:ActivityID" value="[datasource:postActivity.1.id]" />
+<!--       <alert message="https://go.urbanairship.com/api/device_tokens/[system:pushtoken]"/> -->
+      
+    </action>
+    <!--HOME FEED ACTIONS -->
+   <!--
+ <action name="inspiretest" datasource="HomeGet" datasourceevent="querycomplete">
+      <alert title="source" message="https://samhsa.carewave.net/edm-mobile/rs/api/profile/[var:userID]/feed/home"/>
+      <alert title="url" message="[datasource:HomeGet.1.url]" />
+      <alert title="result count" message="[datasource:HomeGet.dataSourceResultCount]" />  
+    </action>  
+-->
+
+    <action name="notification" datasource="pushlistener">
+		<if lhs="[datasource:pushlistener.1.msg]" operator="ne" rhs="">
+			<alert message="there is a message to be retrieved" />
+		</if>
+		<if lhs="[datasource:pushlistener.1.act]" operator="e" rhs="mood">
+			<alert message="have user provide a mood assessment" />
+		</if>
+		<if lhs="[datasource:pushlistener.1.act]" operator="e" rhs="coping">
+			<alert message="take user to the coping page" />
+		</if>
+		<if lhs="[datasource:pushlistener.1.act]" operator="e" rhs="connect">
+			<alert message="show do you need help dialog" />
+		</if>
+		<if lhs="[datasource:pushlistener.1.act]" operator="e" rhs="assess">
+			<alert message="show the user the assessments" />
+		</if>
+		<if lhs="[datasource:pushlistener.1.url]" operator="ne" rhs="">
+			<alert message="take the user to this page [datasource:pushlistener.1.url]" />
+		</if>
+<!--        <alert message="aps-body: [datasource:pushlistener.1.aps/alert/body] aps-alert: [datasource:pushlistener.1.aps/alert] msg: [datasource:pushlistener.1.msg] url: [datasource:pushlistener.1.url] act: [datasource:pushlistener.1.act] ref: [datasource:pushlistener.1.ref]"/> -->
+   	</action>
+   <!--
+ <action name="pushreg" datasource="PushRegister" datasourceevent="querycomplete">
+    	<alert message="[datasource:PushRegister.0.content]"/>
+    </action>
+    <action name="pusherror" datasource="PushRegister" datasourceevent="datasourceerror">
+    	<alert message="ERR [datasource:PushRegister.0.content]"/>
+    </action>
+-->
+    <action name="toggle-signUp">
+      <assign property="var:signUp-status" value="[eval: '[var:signUp-status]' != '1' ? '1' : '0']" />
+      <translate xpos="[eval: '[var:signUp-status]' == '1' ? '0' : '100%']" time=".2" target="WELCOME/signUp" />
+      <translate xpos="[eval: '[var:signUp-status]' == '1' ? '-100%' : '0%']" time=".2" target="WELCOME/signIn" />
+    </action>  
+    <action name="signIn">   
+      <sync>
+        <assign property="datasource:body.removeIndex" value="1" /> 
+        <assign property="datasource:body.add" value="{ 
+          &quot;username&quot;: &quot;[object:WELCOME/signIn/email.text]&quot;, 
+          &quot;password&quot;: &quot;[object:WELCOME/signIn/password.text]&quot; 
+          }"/>
+        <assign property="datasource:body.event" value="querycomplete"/>
+        <assign property="var:postContent" value="[datasource:body.1.content]" />
+        <assign property="datasource:userAuth.postContent" value="[template:postBody.content]" />
+        <assign property="datasource:userAuth.source" value="https://samhsa.carewave.net/edm-mobile/rs/api/user/auth/[object:EMAIL.text]" />
+      </sync>
+    </action>
+    <action name="signUp">   
+      <sync>
+        <assign property="datasource:body.removeIndex" value="1" />
+        <assign property="datasource:body.add" value="{ 
+          &quot;username&quot;: &quot;[object:WELCOME/signUp/email.text]&quot;,
+          &quot;password&quot;: &quot;[object:WELCOME/signUp/password.text]&quot;,
+          &quot;email&quot;: &quot;[object:WELCOME/signUp/email.text]&quot;
+          }"/>
+        <assign property="datasource:body.event" value="querycomplete"/>
+        <assign property="var:postContent" value="[datasource:body.1.content]" />
+        <assign property="datasource:userAuth.postContent" value="[template:postBody.content]" />
+        <assign property="datasource:userAuth.source" value="https://samhsa.carewave.net/edm-mobile/rs/api/user/create" />
+        <assign property="var:newUserSetup" value="1" />
+      </sync>
+    </action> 
+    <action name="userAuthResponse" datasource="userAuth" datasourceevent="querycomplete"> 
+      <if lhs="[eval: JSON.parse('[datasource:userAuth.0.content]')['status']]" operator="!=" rhs="404">
+        <sync>
+         <!-- <alert message="[datasource:userAuth.0.content]" title="userID" />-->
+          <assign property="var:userID" value="[datasource:userAuth.0.content]" />
+<!-- 		  <email subject="userid" body="[var:userID]" toaddress="mlong@rarewire.com" /> -->
+          <if lhs="[var:newUserSetup]" operator="!=" rhs="1">
+            <assign property="datasource:userGet.source" value="https://samhsa.carewave.net/edm-mobile/rs/crud/profile/[var:userID]" />
+            
+            <assign property="datasource:HomeGet.source" value="https://samhsa.carewave.net/edm-mobile/rs/api/profile/[var:userID]/feed/home" />
+            <!--Alternative?
+            https://samhsa.carewave.net/edm-mobile/rs/crud/inspiration?query=%7B%22profile%22%3A %22[var:userID]%22%7D
+            
+            -->
+          </if>
+          <if lhs="[var:newUserSetup]" operator="==" rhs="1">
+            <play action="userSetup" />
+          </if>
+        </sync>
+      </if>
+      <!-- if error -->
+      <if lhs="[eval: JSON.parse('[datasource:userAuth.0.content]')['status']]" operator="==" rhs="404">
+        <alert title="Error" message="The username and password you entered does not exist" />
+      </if>
+    </action>
+    <action name="userSetup">
+      <sync>
+        <assign property="var:userFirstName" value="[object:WELCOME/signUp/firstName.text]" />
+        <assign property="var:userLastName" value="[object:WELCOME/signUp/lastName.text]" />
+        <assign property="var:userEmail" value="[object:WELCOME/signUp/email.text]" />
+        <assign property="var:postContent" value="[template:crudUser.content]" />
+        <assign property="datasource:userUpdate.postContent" value="[template:postBody.content]" />
+        <assign property="datasource:userUpdate.source" value="https://samhsa.carewave.net/edm-mobile/rs/crud/profile/[var:userID]" />
+        <!--<alert message="[template:postBody.content] [var:userFirstName] [var:userLastName]" title="New User" />-->
+      </sync>
+    </action>
+    <action name="userGetResponse" datasource="userGet"> <!-- retreiving a current user info -->
+		<if lhs="[datasource:userGet.1.plan]" operator="ne" rhs="">
+			<assign property="datasource:write-warning.query" value="DELETE FROM WARNING" />
+			<assign property="datasource:write-inspiration.query" value="DELETE FROM INSPIRATION" />
+			<assign property="datasource:write-environment.query" value="DELETE FROM ENVIRONMENT" />
+			<assign property="datasource:write-coping.query" value="DELETE FROM COPE" />
+			<assign property="var:userPlan" value="[datasource:userGet.1.plan]" />
+			<assign property="datasource:planGet.source" value="https://samhsa.carewave.net/edm-mobile/rs/crud/plan/?query=%7B%22profile%22%3A%22[var:userID]%22%7D" />
+			<else>
+				<alert message="user does not have a plan associated, force them to make one" />
+			</else>
+		</if>
+      <assign property="var:username" value="[eval: JSON.parse('[datasource:userGet.1.name]')['first']]" />
+<!--       <alert message="[datasource:userGet.0.content]" /> -->
+      <!--<alert title="[eval: JSON.parse('[datasource:userGet.1.name]')['first']]" message="[datasource:userGet.0.content] " />-->
+<!--       <alert message="var:userPlan is [var:userPlan]" /> -->
+      <play action="dismiss-setup" />
+      <assign property="var:InspireID" value="[datasource:userGet.1.inspiration]" />
+     
+      <!--<alert title="[eval: JSON.parse('[datasource:userGet.1.name]')['first']]" message="[datasource:userGet.0.content] " />-->
+      <if lhs="[var:todaymodal]" operator="ne" rhs="no">
+      	<play action="dismiss-setup" />
+      </if>
+    </action>
+	<action name="planGet-complete" datasource="planGet" datasourceevent="querycomplete" >
+<!-- 		<email subject="hi" body="[datasource:planGet.0.content]" toaddress="mlong@rarewire.com" /> -->
+		<assign property="var:sqlizer" value="on" />
+		<assign property="datasource:warnings.data" value="[datasource:planGet.1.content]" />
+	</action>
+	
+	
+	<!-- !Sqlizer actions -->
+	<action name="warnings-done" datasource="warnings" datasourceevent="querycomplete" >
+		<assign property="var:warningsDSCount" value="[datasource:warnings.dataSourceResultCount]" />
+		<assign property="var:iterateIndex" value="1" />
+		<play action="populateWarningsTable" />
+<!-- 		<alert message="[var:warningsDSCount] warnings" /> -->
+	</action>
+	
+	<action name="populateWarningsTable" >
+		<if lhs="[var:iterateIndex]" operator="lte" rhs="[var:warningsDSCount]">
+			<if lhs="[datasource:warnings.[var:iterateIndex].label]" operator="ne" rhs="">
+				<assign property="datasource:write-warning.query" value="INSERT INTO WARNING (LABEL,TYPE,NOTES) values ('[datasource:warnings.[var:iterateIndex].label]','[datasource:warnings.[var:iterateIndex].type]','[datasource:warnings.[var:iterateIndex].notes]') " />
+				<assign property="var:iterateIndex" value="[eval: [var:iterateIndex] + 1]" />
+				<play action="populateWarningsTable" />
+				<else>
+<!-- 					<alert message="datasource:warnings.[var:iterateIndex].label is empty, moving on"/>  -->
+					<assign property="var:iterateIndex" value="[eval: [var:iterateIndex] + 1]" />
+					<play action="populateWarningsTable" />
+				</else>
+			</if>
+			<else>
+<!-- 				<alert message="warnings table done" /> -->
+				<assign property="datasource:saved-warning.query" value="SELECT * FROM WARNING ORDER BY ID ASC;" />
+				<assign property="datasource:inspiration.data" value="[datasource:planGet.1.content]" />
+			</else>
+		</if>
+	</action>
+
+	<action name="inspiration-done" datasource="inspiration" datasourceevent="querycomplete" >
+		<assign property="var:inspirationDSCount" value="[datasource:inspiration.dataSourceResultCount]" />
+		<assign property="var:iterateIndex" value="1" />
+		<play action="populateInspirationTable" />
+<!-- 		<alert message="[var:inspirationDSCount] inspiration" /> -->
+	</action>
+	<action name="populateInspirationTable" >
+		<if lhs="[var:iterateIndex]" operator="lte" rhs="[var:inspirationDSCount]">
+			<if lhs="[datasource:inspiration.[var:iterateIndex].label]" operator="ne" rhs="">
+				<assign property="datasource:write-inspiration.query" value="INSERT INTO INSPIRATION (LABEL,TYPE,NOTES) values ('[datasource:inspiration.[var:iterateIndex].label]','[datasource:inspiration.[var:iterateIndex].type]','[datasource:inspiration.[var:iterateIndex].notes]') " />
+				<assign property="var:iterateIndex" value="[eval: [var:iterateIndex] + 1]" />
+				<play action="populateInspirationTable" />
+				<else>
+<!-- 					<alert message="datasource:inspiration.[var:iterateIndex].label is empty, moving on"/>  -->
+					<assign property="var:iterateIndex" value="[eval: [var:iterateIndex] + 1]" />
+					<play action="populateInspirationTable" />
+				</else>
+			</if>
+			<else>
+<!-- 				<alert message="inspiration table done" /> -->
+				<assign property="datasource:saved-inspiration.query" value="SELECT * FROM INSPIRATION ORDER BY ID ASC;" />
+				<assign property="datasource:environment.data" value="[datasource:planGet.1.content]" />
+			</else>
+		</if>
+	</action>
+	<action name="environment-done" datasource="environment" datasourceevent="querycomplete" >
+		<assign property="var:environmentDSCount" value="[datasource:environment.dataSourceResultCount]" />
+		<assign property="var:iterateIndex" value="1" />
+		<play action="populateEnvironmentTable" />
+<!-- 		<alert message="[var:environmentDSCount] environment" /> -->
+	</action>
+	<action name="populateEnvironmentTable" >
+		<if lhs="[var:iterateIndex]" operator="lte" rhs="[var:environmentDSCount]">
+			<if lhs="[datasource:environment.[var:iterateIndex].label]" operator="ne" rhs="">
+				<assign property="datasource:write-environment.query" value="INSERT INTO ENVIRONMENT (LABEL) values ('[datasource:environment.[var:iterateIndex].label]') " />
+				<assign property="var:iterateIndex" value="[eval: [var:iterateIndex] + 1]" />
+				<play action="populateEnvironmentTable" />
+				<else>
+<!-- 					<alert message="datasource:environment.[var:iterateIndex].label is empty, moving on"/>  -->
+					<assign property="var:iterateIndex" value="[eval: [var:iterateIndex] + 1]" />
+					<play action="populateEnvironmentTable" />
+				</else>
+			</if>
+			<else>
+<!-- 				<alert message="environment table done" /> -->
+				<assign property="datasource:saved-environment.query" value="SELECT * FROM ENVIRONMENT ORDER BY ID ASC;" />
+				<assign property="datasource:coping.data" value="[datasource:planGet.1.content]" />
+			</else>
+		</if>
+	</action>
+	<action name="coping-done" datasource="coping" datasourceevent="querycomplete" >
+		<assign property="var:copingDSCount" value="[datasource:coping.dataSourceResultCount]" />
+		<assign property="var:iterateIndex" value="1" />
+		<play action="populateCopingTable" />
+<!-- 		<alert message="var:copingDSCount is [var:copingDSCount]" /> -->
+	</action>
+	<action name="populateCopingTable" >
+		<if lhs="[var:iterateIndex]" operator="lte" rhs="[var:copingDSCount]">
+			<if lhs="[datasource:coping.[var:iterateIndex].type]" operator="ne" rhs="">
+		    	<assign property="datasource:write-coping.query" value="INSERT INTO COPE (nid,text,photo,type) values ('[datasource:coping.[var:iterateIndex].nodeID]','[datasource:coping.[var:iterateIndex].text]','[datasource:coping.[var:iterateIndex].photo]','[datasource:coping.[var:iterateIndex].type]')" /> 
+				<assign property="var:iterateIndex" value="[eval: [var:iterateIndex] + 1]" />
+				<play action="populateCopingTable" />
+				<else>
+<!-- 					<alert message="datasource:coping.[var:iterateIndex].type is empty, moving on"/>  -->
+					<assign property="var:iterateIndex" value="[eval: [var:iterateIndex] + 1]" />
+					<play action="populateCopingTable" />
+				</else>
+			</if>
+			<else>
+				<assign property="datasource:saved-coping.query" value="SELECT * FROM COPE ORDER BY ID ASC;" />
+				<alert message="all tables populated" />
+				<assign property="var:sqlizer" value="" />
+			</else>
+		</if>
+	</action>
+	
+	<action name="coping-done" datasource="saved-coping" datasourceevent="querycomplete" >
+		<assign property="var:copingCount" value="[datasource:saved-coping.dataSourceResultCount]" />
+		<alert message="coping count is [datasource:saved-coping.dataSourceResultCount]" />
+	</action>
+
+
+    <action name="userCreateResponse" datasource="userUpdate"> <!-- used to get a new users info -->
+      <assign property="var:username" value="[eval: JSON.parse('[datasource:userUpdate.1.name]')['first']]" />
+      <alert title="[eval: JSON.parse('[datasource:userUpdate.1.name]')['first']]" message="[datasource:userUpdate.0.content] " />
+      <if lhs="[var:todaymodal]" operator="ne" rhs="no">
+      	<play action="dismiss-setup" />
+      </if>
+    </action>
+    <action name="dismiss-setup">
+      <sync>
+        <assign property="object:WRAPPER/toolbar/label.text" value="Hello [var:username]" />
+        <keyboard visible="no" target="WELCOME/signIn/password"/>
+        <keyboard visible="no" target="WELCOME/signIn/email"/>
+        <keyboard visible="no" target="WELCOME/signUp/password"/>
+        <keyboard visible="no" target="WELCOME/signUp/lastName"/>
+        <alpha value="0" time=".2" target="WELCOME" />
+        <alpha value="1" time="0" target="TODAYMODAL" />
+       <!-- <alert message="[var:username]" title="The User" />-->
+      </sync>
+    </action>
+    <action name="dismiss-today-modal">
+      <alpha value="0" time=".2" target="TODAYMODAL" />
+    </action>
+    <!-- 
+      Navigation 
+    -->
+    <action name="toggle-toc">
+      <sync>
+	    <alpha value="0" time="0" target="CAMERA" />
+	    <alpha value="0" time="0" target="CAMERA-ROLL" /> 
+        <assign property="var:navStatus" value="[eval: '[var:navStatus]' == '1' ? '0' : '1']" />
+        <translate xpos="[eval: '[var:navStatus]' == '1' ? '80%' : '0%']" time=".3" target="WRAPPER" />
+        <alpha value="[eval: '[var:navStatus]' == '1' ? '.3' : '0']" time=".2" target="CURTAIN" />
+      </sync>
+    </action>
+    <action name="reveal-section">
+      <assign property="var:navStatus" value="0" />  
+        <sync>
+          <translate xpos="100%" time=".3" target="WRAPPER" />
+          <translate xpos="100%" target="WRAPPER/[var:currentSection]" />
+          <play action="section-reset" _section="[var:currentSection]" />          
+          <assign property="var:currentSection" value="[object:name]" />
+          <play action="toolbar-prep" />
+          <alpha value="0" target="CURTAIN" />
+          <if lhs="[object:name]" operator="!=" rhs="Journal">
+            <translate xpos="0" target="WRAPPER/[var:currentSection]" />
+          </if>
+          <if lhs="[object:name]" operator="=" rhs="Home">
+            <assign property="datasource:HomeGet.source" value="https://samhsa.carewave.net/edm-mobile/rs/api/profile/[var:userID]/feed/home" />
+          </if>
+          <if lhs="[object:name]" operator="=" rhs="Journal">
+            <translate xpos="0" target="WRAPPER/Home" />
+            <translate valign="bottom" time=".2" target="WRAPPER/Home/journal" />
+          </if>
+          <if lhs="[object:name]" operator="=" rhs="Treatment Locator">
+            <assign property="datasource:locator.source" value="https://samhsa.carewave.net/edm-mobile/rs/query/facilities/nearLoc/[object:MAP.gpslongitude],[object:MAP.gpslatitude]" />
+            <assign property="object:MAP.region" value="[eval:[object:MAP.gpslatitude] - [eval:deltaForMiles([object:MAP.gpslatitude],[object:MAP.gpslongitude],30)]] [eval:[object:MAP.gpslongitude] - [eval:deltaForMiles([object:MAP.gpslatitude],[object:MAP.gpslongitude],30)]]] [eval:[object:MAP.gpslatitude] +[eval:deltaForMiles([object:MAP.gpslatitude],[object:MAP.gpslongitude],30)]]] [eval:[object:MAP.gpslongitude] + [eval:deltaForMiles([object:MAP.gpslatitude],[object:MAP.gpslongitude],30)]]"/>
+
+          </if>
+          <translate xpos="0" time=".3" target="WRAPPER" />
+        </sync>
+    </action>
+    <action name="toolbar-prep">
+      <assign property="object:WRAPPER/toolbar/label.text" value="[var:currentSection]" />
+      <if lhs="[var:currentSection]" operator="=" rhs="Home">
+        <alpha value="1" target="WRAPPER/toolbar/btn-right" />
+        <load source="graphics/icon-top-attach.png" target="WRAPPER/toolbar/btn-right" />
+        <set onclickup="choose-inspiration-attachment" target="WRAPPER/toolbar/btn-right" />
+      </if>
+      <if lhs="[var:currentSection]" operator="=" rhs="Safety Plan">
+        <alpha value="0" target="WRAPPER/toolbar/btn-right" />
+      </if>
+      <if lhs="[var:currentSection]" operator="=" rhs="Care Team">
+        <alpha value="1" target="WRAPPER/toolbar/btn-right" />
+        <load source="graphics/" target="WRAPPER/toolbar/btn-right" />
+        <set onclickup="add-feature" target="WRAPPER/toolbar/btn-right" />
+      </if>
+      <if lhs="[var:currentSection]" operator="=" rhs="Journal">
+        <alpha value="1" target="WRAPPER/toolbar/btn-right" />
+        <load source="graphics/icon-top-journal.png" target="WRAPPER/toolbar/btn-right" />
+        <set onclickup="toggle-history" target="WRAPPER/toolbar/btn-right" />
+      </if>
+      <if lhs="[var:currentSection]" operator="=" rhs="Treatment Locator">
+        <alpha value="0" target="WRAPPER/toolbar/btn-right" />
+        <set onclickup="null" target="WRAPPER/toolbar/btn-right" />
+      </if>
+      <if lhs="[var:currentSection]" operator="=" rhs="Settings">
+        <alpha value="0" target="WRAPPER/toolbar/btn-right" />
+        <set onclickup="null" target="WRAPPER/toolbar/btn-right" />
+      </if>
+      <if lhs="[var:currentSection]" operator="=" rhs="Coping Techniques">
+        <alpha value="0" target="WRAPPER/toolbar/btn-right" />
+        <set onclickup="null" target="WRAPPER/toolbar/btn-right" />
+      </if>
+      <if lhs="[var:currentSection]" operator="=" rhs="Inspiration">
+        <alpha value="1" target="WRAPPER/toolbar/btn-right" />
+        <load source="graphics/icon-top-attach.png" target="WRAPPER/toolbar/btn-right" />
+        <set onclickup="choose-inspiration-attachment" target="WRAPPER/toolbar/btn-right" />
+      </if>
+      <if lhs="[var:currentSection]" operator="=" rhs="Assessment">
+        <alpha value="1" target="WRAPPER/toolbar/btn-right" />
+        <load source="graphics/" target="WRAPPER/toolbar/btn-right" />
+        <set onclickup="null" target="WRAPPER/toolbar/btn-right" />
+      </if>
+      <if lhs="[var:currentSection]" operator="=" rhs="History">
+        <alpha value="1" target="WRAPPER/toolbar/btn-right" />
+        <load source="graphics/icon-top-compose.png" target="WRAPPER/toolbar/btn-right" />
+        <assign property="object:HOME/history/datebar/label.text" value="[eval: dateConverter('[eval:new Date().toUTCString();]','mmmm dS') ]" />
+        <set onclickup="toggle-history" target="WRAPPER/toolbar/btn-right" />
+      </if>
+    </action>
+    <action name="section-reset">
+      <translate ypos="100%" target="WRAPPER/Home/history" />
+      <translate ypos="100%" target="WRAPPER/Home/assessment" />
+      <translate ypos="100%" target="WRAPPER/Home/journal" />
+      <alpha value="1" target="HOME/feelingMeter/a" />
+      <alpha value="1" target="HOME/feelingMeter/b" />
+      <alpha value="1" target="HOME/feelingMeter/c" />
+      <alpha value="1" target="HOME/feelingMeter/d" />
+      <alpha value="1" target="HOME/feelingMeter/e" />
+    </action>
+    <action name="call-hotline">
+    	<load url="tel://1-800-273-8255" target="WEB"/>
+    </action>
+    <action name="call-map">
+    	<load url="tel://[eval: '_phonenumber'.replace('(','').replace(')','-').replace(' ','')]" target="WEB"/>
+    </action>
+        <action name="reveal-location">
+    	<assign property="var:navStatus" value="0" />
+        <sync>
+          <translate xpos="100%" time=".3" target="WRAPPER" />
+          <translate xpos="100%" target="WRAPPER/Treatment Locator" />
+          <play action="section-reset" _section="Treatment Locator" />          
+          <assign property="var:currentSection" value="Treatment Locator" />
+          <play action="toolbar-prep" />
+          <alpha value="0" target="CURTAIN" />
+          <translate xpos="0" target="WRAPPER/Treatment Locator" />
+          <sync>
+          	 <assign property="datasource:locator.source" value="https://samhsa.carewave.net/edm-mobile/rs/query/facilities/nearLoc/[object:MAP.gpslongitude],[object:MAP.gpslatitude]" />
+          	 <assign property="object:MAP.region" value="[eval:[object:MAP.gpslatitude] - [eval:deltaForMiles([object:MAP.gpslatitude],[object:MAP.gpslongitude],30)]] [eval:[object:MAP.gpslongitude] - [eval:deltaForMiles([object:MAP.gpslatitude],[object:MAP.gpslongitude],30)]]] [eval:[object:MAP.gpslatitude] +[eval:deltaForMiles([object:MAP.gpslatitude],[object:MAP.gpslongitude],30)]]] [eval:[object:MAP.gpslongitude] + [eval:deltaForMiles([object:MAP.gpslatitude],[object:MAP.gpslongitude],30)]]"/>
+          </sync>
+          <translate xpos="0" time=".3" target="WRAPPER" />
+        </sync>
+        <play action="dismiss-today-modal" />
+    	
+    </action>
+        <!-- toggle control --> 
+    <action name="toggle-view">
+      <sync>
+        <assign property="object:background" value="#6d8693" />
+        <assign property="object:../@active.background" value="#819bad" />
+        <set onclickup="toggle-view" target="../@active" />
+        <set tostate="active" />
+        <set onclickup="null" />
+      </sync>
+      <if lhs="[var:currentSection]" operator="=" rhs="settings">
+        <alpha value="[eval: '_type' == 'account' ? '1' : '0']" target="SETTINGS-CONTAINER" />
+        <alpha value="[eval: '_type' == 'safety' ? '1' : '0']" target="SAFETY-CONTAINER" />
+      </if>
+      <if lhs="_type" operator="ne" rhs="">
+      	<alpha value="[eval: '_type' == 'Physical' ? '1' : '0']" target="PHYSICAL" />
+      	<alpha value="[eval: '_type' == 'Mental' ? '1' : '0']" target="MENTAL" />
+      	<alpha value="[eval: '_type' == 'Spiritual' ? '1' : '0']" target="SPIRITUAL" />
+      	<alpha value="[eval: '_type' == 'Physical' ? '1' : '0']" target="PLIST" />
+      	<alpha value="[eval: '_type' == 'Mental' ? '1' : '0']" target="MLIST" />
+      	<alpha value="[eval: '_type' == 'Spiritual' ? '1' : '0']" target="SLIST" />
+      </if>
+    </action>
+    <!-- Journal -->
+    <action name="reveal-journal">
+      <sync>
+      	<if lhs="[object:name]" operator="e" rhs="a">
+      		<assign property="var:mood" value="1" />
+      	</if>
+      	<if lhs="[object:name]" operator="e" rhs="b">
+      		<assign property="var:mood" value="2" />
+      	</if>
+      	<if lhs="[object:name]" operator="e" rhs="c">
+      		<assign property="var:mood" value="3" />
+      	</if>
+      	<if lhs="[object:name]" operator="e" rhs="d">
+      		<assign property="var:mood" value="4" />
+      	</if>
+      	<if lhs="[object:name]" operator="e" rhs="e">
+      		<assign property="var:mood" value="5" />
+      	</if>
+<!--         <assign property="var:mood" value="[object:name]" /> -->
+        <play action="set-mood" />
+        <if lhs="[var:currentSection]" operator="==" rhs="Home">
+          <sync>
+           <assign property="var:currentSection" value="Journal" />
+           <play action="toolbar-prep" />
+          </sync>
+          <translate valign="bottom" time=".2" target="WRAPPER/Home/journal" />
+        </if>
+              </sync>
+    </action>
+    <action name="journal-share">
+    	<email subject="Share Journal Entry" body="This message is from [datasource:userGet.1.name]\n\n [object:CURRENTACTIVITYBODY.text]" />
+    </action>
+    
+    <action name="set-mood">
+      <sync>
+        <alpha value="[eval: '[var:mood]' != '1' ? '.3' : '1']" target="HOME/feelingMeter/a" />
+        <alpha value="[eval: '[var:mood]' != '2' ? '.3' : '1']" target="HOME/feelingMeter/b" />
+        <alpha value="[eval: '[var:mood]' != '3' ? '.3' : '1']" target="HOME/feelingMeter/c" />
+        <alpha value="[eval: '[var:mood]' != '4' ? '.3' : '1']" target="HOME/feelingMeter/d" />
+        <alpha value="[eval: '[var:mood]' != '5' ? '.3' : '1']" target="HOME/feelingMeter/e" />
+      </sync>
+      <if lhs="[var:mood]" operator="e" rhs="1">
+        	<sync loop="no" startdelay="0">
+	        	<delete target="MOODCHECK"/>
+	        	<create class="create-mood-check" target="CHECKBLOCK"/>
+	        	<create class="feeling-row"  col-1-label="Angry"  col-2-label="Fearful" target="ROW1"/>
+	        	<create class="feeling-row"  col-1-label="Frustrated"  col-2-label="Hostile" target="ROW2"/>
+	        	<create class="feeling-row"  col-1-label="Hyper"  col-2-label="Other" target="ROW3"/>
+	        </sync>
+        </if>
+        <if lhs="[var:mood]" operator="e" rhs="2">
+        	<sync loop="no" startdelay="0">
+	        	<delete target="MOODCHECK"/>
+	        	<create class="create-mood-check" target="CHECKBLOCK"/>
+	        	<create class="feeling-row"  col-1-label="Anxious"  col-2-label="Ashamed" target="ROW1"/>
+	        	<create class="feeling-row"  col-1-label="Cranky"  col-2-label="Lonely" target="ROW2"/>
+	        	<create class="feeling-row"  col-1-label="Sleepy"  col-2-label="Other" target="ROW3"/>
+	        </sync>
+        </if>
+        <if lhs="[var:mood]" operator="e" rhs="3">
+        	<sync loop="no" startdelay="0">
+	        	<delete target="MOODCHECK"/>
+	        	<create class="create-mood-check" target="CHECKBLOCK"/>
+	        	<create class="feeling-row"  col-1-label="Blah"  col-2-label="Bored" target="ROW1"/>
+	        	<create class="feeling-row"  col-1-label="Calm"  col-2-label="Lazy" target="ROW2"/>
+	        	<create class="feeling-row"  col-1-label="Numb"  col-2-label="Other" target="ROW3"/>
+	        </sync>
+        </if>
+        <if lhs="[var:mood]" operator="e" rhs="4">
+        	<sync loop="no" startdelay="0">
+	        	<delete target="MOODCHECK"/>
+	        	<create class="create-mood-check" target="CHECKBLOCK"/>
+	        	<create class="feeling-row"  col-1-label="Alert"  col-2-label="Attentive" target="ROW1"/>
+	        	<create class="feeling-row"  col-1-label="Determined"  col-2-label="Pleased" target="ROW2"/>
+	        	<create class="feeling-row"  col-1-label="Upbeat"  col-2-label="Other" target="ROW3"/>
+	        </sync>
+        </if>
+        <if lhs="[var:mood]" operator="e" rhs="5">
+        	<sync loop="no" startdelay="0">
+	        	<delete target="MOODCHECK"/>
+	        	<create class="create-mood-check" target="CHECKBLOCK"/>
+	        	<create class="feeling-row"  col-1-label="Alert"  col-2-label="Confident" target="ROW1"/>
+	        	<create class="feeling-row"  col-1-label="Enthusiastic"  col-2-label="Happy" target="ROW2"/>
+	        	<create class="feeling-row"  col-1-label="Rested"  col-2-label="Other" target="ROW3"/>
+	        </sync>
+      	</if>
+    </action>
+    <action name="checkmarked">
+    	<assign property="var:feeling" value="_label" />
+    	<if lhs="[var:checked]" operator="ne" rhs="yes">
+    		<assign property="object:background" value="126f93" />
+    		<assign property="var:checked" value="yes" />
+    	</if>
+    	<set onclickup="uncheckmarked"/>
+    </action>
+    <action name="uncheckmarked">
+    	<assign property="object:background" value="e9e9e9" />
+    	<assign property="var:checked" value="no" />
+    	<set onclickup="checkmarked"/>
+    </action>
+    <!--COPING ACTIONS-->
+	<action name="add-coping-item">
+		<sync>
+	    	<assign property="object:background" value="126f93" />
+	    	<assign property="var:cope-checked" value="yes" />
+	    	<assign property="datasource:write-coping.query" value="INSERT INTO COPE (nid,text,photo,type) values ('_nodeID','_text','_photo','_type')" /> 
+	        <assign property="datasource:saved-coping.query" value="SELECT * FROM COPE"/>
+	        <assign property="preferences:bookmark-_nodeID" value="yes" />
+	        <set onclickup="remove-coping-item"/>
+		</sync>	        
+	</action>
+    <action name="remove-coping-item">
+    	<sync>
+	    	<assign property="object:background" value="e9e9e9" />
+	    	<assign property="var:cope-checked" value="no" />
+	    	<assign property="datasource:write-coping.query" value="DELETE FROM COPE WHERE nid='_nodeID'"/>
+	        <assign property="datasource:saved-coping.query" value="SELECT * FROM COPE"/>
+	    	<set onclickup="add-coping-item"/>
+    	</sync>
+    </action>
+    <action name="toggle-assessment">
+      <sync>
+        <assign property="var:currentSection" value="[eval: '[var:currentSection]' != 'Journal' ? 'Journal' : 'Assessment']" />
+        <play action="toolbar-prep" />
+        <translate ypos="[eval: '[var:currentSection]' != 'Journal' ? '0' : '100%']" time=".2" target="WRAPPER/Home/assessment" />
+      </sync>
+    </action>
+    <action name="toggle-history">
+      <sync>
+        <assign property="datasource:ActivityGet.source" value="https://samhsa.carewave.net/edm-mobile/rs/query/profile/[var:userID]/journal"/>
+        <assign property="var:currentSection" value="[eval: '[var:currentSection]' != 'Journal' ? 'Journal' : 'History']" />
+        <play action="toolbar-prep" />
+        <translate ypos="[eval: '[var:currentSection]' != 'Journal' ? '0' : '100%']" time=".2" target="WRAPPER/Home/history" />
+        <alpha value="1" target="HOME/feelingMeter/a" />
+      	<alpha value="1" target="HOME/feelingMeter/b" />
+     	<alpha value="1" target="HOME/feelingMeter/c" />
+        <alpha value="1" target="HOME/feelingMeter/d" />
+        <alpha value="1" target="HOME/feelingMeter/e" />
+        <assign property="object:CURRENTACTIVITYBODY.text" value="" />
+      </sync>
+    </action>
+    <!--assessment actions -->
+    <action name="active-sleep-item">
+    	<alert message="_active"/>
+    	<if lhs="_active" operator="ne" rhs="">
+    		<assign property="[object:OPTION-1.background]" value="ff0000" />
+    	</if>
+    </action>
+    <!--Inspiration Section-->
+    <action name="choose-inspiration-attachment">
+    	<alpha value="1" time="0" target="ADDINSPIRE"/>
+    	<alpha value="0" time="0" target="CAMERA" />
+    	<alpha value="0" time="0" target="CAMERA-ROLL" />
+    </action>
+    <action name="close-inspiration-attachment">
+    	<alpha value="0" time="0" target="ADDINSPIRE"/>
+    	<set onclickup="choose-inspiration-attachment" />
+    </action>
+    <!-- paginate dots : activities -->
+    <action name="paginate">
+      <sync>
+        <assign property="object:COPINGTECHNIQUES/main/dots/@active/dot.background" value="#ffffff" />
+        <assign property="object:COPINGTECHNIQUES/main/dots/[object:name]/dot.background" value="#8fbf6b" />
+        <assign property="var:activities-pg" value="[object:name]" />
+        <set tostate="active" target="COPINGTECHNIQUES/main/dots/[var:activities-pg]" />
+      </sync>
+    </action>
+    <!-- next/previous in pager : generic -->
+    <action name="step">
+      <assign property="var:step" value="[object:name]" />
+      <scroll page="[eval: '[var:step]' == 'btn-prev' ? 'prev' : 'next']" target="_pager" />
+      <play action="step-buttons" />
+    </action>
+    <action name="step-buttons">
+		<assign property="var:activeStep" value="[object:name]" />
+      <assign property="object:_aliasTarget/top/label.text" value="[object:_aliasTarget/main.page] of 5_colon" />
+      <assign property="object:ASSESSSTEPS.text" value="[object:_aliasTarget/main.page] of 3" />
+      <if lhs="[object:_aliasTarget/main.page]" operator="=" rhs="1">
+        <alpha value="0" target="_aliasTarget/steps/btn-prev" />
+        <else>
+          <alpha value="1" target="_aliasTarget/steps/btn-prev" />
+        </else>
+      </if>
+      <if lhs="[object:_aliasTarget/main.page]" operator="=" rhs="5">
+        <alpha value="0" target="_aliasTarget/steps/btn-next" />
+        <else>
+          <alpha value="1" target="_aliasTarget/steps/btn-next" />
+        </else>
+      </if>
+
+    </action>
+    <action name="step-assess">
+      <assign property="var:step" value="[object:name]" />
+      <scroll page="[eval: '[var:step]' == 'btn-prev' ? 'prev' : 'next']" target="_pager" />
+      <play action="step-buttons-assessment" />
+    </action>
+    <action name="step-buttons-assessment">
+      <assign property="object:ASSESSSTEPS.text" value="[object:_aliasTarget/main.page] of 3" />
+      <if lhs="[object:_aliasTarget/main.page]" operator="=" rhs="1">
+        <alpha value="0" target="_aliasTarget/steps/btn-prev" />
+        <else>
+          <alpha value="1" target="_aliasTarget/steps/btn-prev" />
+        </else>
+      </if>
+      <if lhs="[object:_aliasTarget/main.page]" operator="=" rhs="3">
+        <alpha value="0" target="_aliasTarget/steps/btn-next" />
+        <else>
+          <alpha value="1" target="_aliasTarget/steps/btn-next" />
+        </else>
+      </if>
+    </action>
+    
+    <!-- Home Filter when scrolling down -->
+    <action name="toggle-filter">
+      <sync>
+        <assign property="var:filterStatus" value="[eval: '[var:filterStatus]' != 'active' ? 'active' : 'inactive']" />
+        <translate ypos="[eval: '[var:filterStatus]' != 'active' ? '100%' : '[eval:[object:WRAPPER/Home.height] - [object:WRAPPER/Home/filter.height] ]']" time=".2" target="WRAPPER/Home/filter" />
+      </sync>
+    </action>
+
+    <action name="post-activity">
+      <sync>
+        <assign property="var:currentActivityBody" value="[object:CURRENTACTIVITYBODY.text]" />
+        <assign property="var:postContent" value="[template:crudActivity.content]" />
+        <assign property="datasource:postActivity.postContent" value="[template:postBody.content]" />
+        <assign property="datasource:postActivity.source" value="https://samhsa.carewave.net/edm-mobile/rs/crud/activity/" />
+        <alert title="pre-submission" message="[template:postBody.content]" />
+      </sync>
+    </action>
+
+    <action name="journaltest" datasource="postActivity" datasourceevent="querycomplete">
+      <alert title="post" message="[datasource:postActivity.0.content]" />
+      <assign property="var:ActivityID" value="[datasource:postActivity.1.id]" />
+    </action>
+
+
+
+    <action name="dismiss-keyboard">
+      <keyboard visible="no" />
+    </action>
+    <action name="null">
+    </action>
+    <action name="lost">
+      <alert title="Need" message="unclear of what action trigger here" />
+    </action>
+    <action name="add-feature">
+      <alert title="feature" message="will launch feature" />
+    </action>
+    
+    		
+	<!-- !Camera -->
+	<action name="show-camera">
+		<alpha value="0" time="0" target="ADDINSPIRE" />
+		<assign property="var:face" value="front" />
+		<assign property="var:cam" value="_cam" />
+		<alpha value="1" time="0" target="[eval: '[var:cam]' == 'camera' ? 'CAMERA' : 'CAMERA-ROLL']" />
+		<translate xpos="0" time=".2" curve="easeout" target="[eval: '[var:cam]' == 'camera' ? 'CAMERA' : 'CAMERA-ROLL']" />
+		
+	    <if lhs="[var:cam]" operator="e" rhs="camera">
+            <create class="camera" target="CAMERA/lens/photo/box" face="[var:face]" />
+            <else>
+				  <translate ypos="[eval: [object:WRAPPER.height] - 60]" time=".3" curve="easeout" target="ROLL-WAIT" />
+                  <create class="rollPager" target="CAMERA-ROLL" />
+                  <assign property="var:rowcount" value="0"/>
+                  <assign property="var:photoCount" value="1"/>
+                  <assign property="datasource:photos.source" value="assets"/>
+            </else>
+	    </if>
+	</action>
+	<action name="hide-camera">
+		
+		<alpha value="0" time="0" delay=".2" target="[eval: '[var:cam]' == 'camera' ? 'CAMERA' : 'CAMERA-ROLL']" />
+		<translate xpos="100%" time=".2" curve="easeout" target="[eval: '[var:cam]' == 'camera' ? 'CAMERA' : 'CAMERA-ROLL']" />
+		
+          <if lhs="[var:cam]" operator="e" rhs="camera">
+                <delete target="CAMERA-OBJECT" />
+                <else>
+                      <delete target="CAMERA-ROLL/roll" />
+                </else>
+          </if>
+	</action>
+	
+    <action name="buildPhotos">
+        <if lhs="[datasource:photos.dataSourceResultCount]" operator="gt" rhs="0">
+            <sync>
+                <assign property="var:photoTotal" value="[datasource:photos.dataSourceResultCount]"/>
+                <play anim="startBuild"/>
+            </sync>
+        </if>
+    </action>
+    
+    <action name="startBuild">
+        <sync>
+              <if lhs="[var:photoTotal]" operator="e" rhs="2">
+                    <create class="rollRow3" target="CAMERA-ROLL/roll" index="[var:photoCount]" imagea="[datasource:photos.[var:photoCount].url]" imageb="[datasource:photos.[eval: [var:photoCount] + 1].url]" />
+                      <translate ypos="100%" time=".3" curve="easeout" target="ROLL-WAIT" />
+              </if>
+              <if lhs="[var:photoTotal]" operator="e" rhs="1">
+                    <create class="rollRow3" target="CAMERA-ROLL/roll" index="[var:photoCount]" imagea="[datasource:photos.[var:photoCount].url]" />
+                      <translate ypos="100%" time=".3" curve="easeout" target="ROLL-WAIT" />
+              </if>
+              <if lhs="[var:photoTotal]" operator="gte" rhs="3">
+                    <create class="rollRow3" target="CAMERA-ROLL/roll" index="[var:photoCount]" imagea="[datasource:photos.[var:photoCount].url]" imageb="[datasource:photos.[eval: [var:photoCount] + 1].url]" imagec="[datasource:photos.[eval: [var:photoCount] + 2].url]" />
+                    <assign property="var:photoTotal" value="[eval: [var:photoTotal] - 3]" />
+                    <assign property="var:photoCount" value="[eval: [var:photoCount] + 3]" />
+                    <play action="startBuild" />
+              </if>
+              <if lhs="[var:photoTotal]" operator="e" rhs="0">
+                      <translate ypos="100%" time=".3" curve="easeout" target="ROLL-WAIT" />
+              </if>
+        </sync>
+    </action>
+	<action name="select-rollPhoto">
+		<sync>
+			<if lhs="[var:rollRow]" operator="!=" rhs="">
+			      <alpha value="0" time=".1" target="CAMERA-ROLL/roll/[var:rollRow]/[var:rollCol]/imageCrop/check" />
+			</if>
+			<assign property="var:rollRow" value="_row" />
+			<assign property="var:rollCol" value="_column" />
+			<alpha value="1" time=".1" target="CAMERA-ROLL/roll/[var:rollRow]/[var:rollCol]/imageCrop/check" />
+            <load asset="[datasource:photos._assetIndex.url]" target="CAMERA/lens/photo/box/asset" />
+            <if lhs="[var:cam]" operator="ne" rhs="camera">
+                      <alpha value="1" target="CAMERA/lens/photo/box/asset" />
+                </if>
+                <capture target="CAMERA/lens/photo/box" tofile="photo2.png" />
+                <play action="photo-saved" />
+		</sync>
+	</action>
+	<action name="photo-saved" >
+          <alert message="image saved? [file:photo2.png]"/>
+          <assign property="datasource:uploadPhoto.postFile" value="photo2.png"/>
+          <assign property="datasource:uploadPhoto.source" value="https://samhsa.carewave.net/edm-mobile/rs/crud/blob/"/>
+          <if lhs="[var:cam]" operator="ne" rhs="camera">
+                <alpha value="0" target="CAMERA/lens/photo/box/asset" />
+          </if>
+          
+    </action>
+    <action name="photouploaded" datasource="uploadPhoto" datasourceevent="querycomplete">
+    	<assign property="var:photoID" value="[datasource:uploadPhoto.1.id]" />
+<!--     	<alert title="stored variable" message="[var:photoID]"/> -->
+    	<play action="post-inspire" />
+    </action>
+    <action name="photouploaded" datasource="uploadPhoto" datasourceevent="datasourceerror">
+    	<alert message="ERROR [datasource:uploadPhoto.0.content]"/>
+    </action>
+
+	<action name="camera-flip">
+          <sync>
+                <delete target="CAMERA-OBJECT" />
+                <create class="camera" target="CAMERA/lens/photo/box" face="[eval: '[var:face]' == 'front' ? 'back' : 'front' ]" />
+                <assign property="var:face" value="[eval: '[var:face]' == 'front' ? 'back' : 'front' ]" />
+          </sync>
+	</action>
+	 
+    <action name="take-photo" >
+          <event type="pausePreview" target="CAMERA-OBJECT" />
+          <set onclickup="unfreeze" target="CAMERA/toolbar/shutter" />
+    </action>
+    <action name="commit-photo">
+    	 <capture target="CAMERA/lens/photo/box" tofile="photo2.png" />
+          <play action="photo-saved" />
+    </action>
+    <action name="unfreeze" >
+		<event type="resumePreview" target="CAMERA-OBJECT" />
+          <set onclickup="take-photo" target="CAMERA/toolbar/shutter" />
+    </action>
+    
+<!-- Inspire Post -->       
+    <action name="post-inspire"> 
+	 	 <alert title="Do I have a var:Inspireid?" message="[var:InspireID]"/>
+	 	 <if lhs="[var:InspireID]" operator="ne" rhs="">
+	 	 <sync>
+	        <assign property="var:postContent" value="[template:crudInspireUpdate.content]" />
+	        <assign property="datasource:postInspireUpdate.postContent" value="[template:postBody.content]" />
+	        <assign property="datasource:postInspireUpdate.source" value="https://samhsa.carewave.net/edm-mobile/rs/crud/inspiration/[var:InspireID]" />
+	        <assign property="datasource:HomeGet.source" value="https://samhsa.carewave.net/edm-mobile/rs/api/profile/[var:userID]/feed/home" />
+	        <assign property="var:todaymodal" value="no" />
+	        <alert title="ID Yes" message="[template:postBody.content]" />
+        </sync>
+	 	 </if>
+	 	 <if lhs="[var:InspireID]" operator="e" rhs="">
+	 	 <sync>
+	        <assign property="var:postContent" value="[template:crudInspire.content]" />
+	        <assign property="datasource:postInspire.postContent" value="[template:postBody.content]" />
+	        <assign property="datasource:postInspire.source" value="https://samhsa.carewave.net/edm-mobile/rs/crud/inspiration/" />
+	        <assign property="datasource:HomeGet.source" value="https://samhsa.carewave.net/edm-mobile/rs/api/profile/[var:userID]/feed/home" />
+	        <assign property="var:todaymodal" value="no" />
+	        <alert title="ID no" message="[template:postBody.content]" />
+	        <play action="hide-camera" />
+        </sync>
+        </if> 
+	</action>
+    <action name="inspiretest" datasource="postInspire" datasourceevent="querycomplete">
+	  <alert title="id" message="[datasource:postInspire.1.id]" />
+      <alert title="post" message="[datasource:postInspire.0.content]" />
+      <assign property="var:InspireID" value="[datasource:postInspire.1.id]" /> 
+      <assign property="var:todaymodal" value="no" />
+      <alert title="var id" message="[var:InspireID]" />
+      <assign property="var:postContent" value="[template:crudUser.content]" />
+      <assign property="datasource:userUpdate.postContent" value="[template:postBody.content]" />
+      <assign property="datasource:userUpdate.source" value="https://samhsa.carewave.net/edm-mobile/rs/crud/profile/[var:userID]" />
+ 
+    </action> 
+	<action name="inspiretest-update" datasource="postInspireUpdate" datasourceevent="querycomplete"> 		
+      <alert title="post-update" message="[datasource:postInspireUpdate.0.content]" />
+    </action>     
+  
+  <!--MAP LIST ACTIONS -->
+  			<action name="show-maplist">
+  				<translate xpos="0" time="0" curve="linear" target="ESTABLISHMENTLIST-CONTAINER" />
+  				<alpha value="1" time="0" target="ESTABLISHMENTLIST-CONTAINER" />
+  				<set onclickup="close-maplist" target="MAPLIST" />
+  			</action>
+  			<action name="close-maplist">
+  				<translate xpos="100%" time="0" curve="linear" target="ESTABLISHMENTLIST-CONTAINER" />
+  				<alpha value="0" time="0" target="ESTABLISHMENTLIST-CONTAINER" />
+  				<set onclickup="show-maplist" target="MAPLIST" />
+  			</action>
+  
+		<!-- !Warning/Inspiration Actions -->
+		<action name="launch-dropdown">
+			<assign property="var:entryIndex" value="_index" />
+			<assign property="datasource:dropdowns.source" value="res://_dropdown" />
+		</action>
+		<action name="show-dropdown" datasource="dropdowns" datasourceevent="querycomplete" >
+			<alpha value="1" time=".3" target="DROPDOWN" />
+		</action>
+		<action name="select-type">
+			<alpha value="0" time=".3" target="DROPDOWN" />
+			<assign property="object:PLAN-ITEM-TYPE-1.text" value="[object:text]" />
+		</action>
+		<action name="add-plan-item" >
+			<alpha value="1" time=".3" target="PLAN-ITEM" />
+		</action>
+		<action name="save-plan-item">
+			<assign property="var:dbAction" value="write" />
+			<if lhs="[var:activeStep]" operator="e" rhs="1">
+				<sync>
+					<if lhs="[var:itemAction]" operator="e" rhs="edit">
+						<assign property="datasource:write-warning.query" value="UPDATE WARNING SET LABEL='[object:PLAN-ITEM-LABEL-1.text]',TYPE='[object:PLAN-ITEM-TYPE-1.text]',NOTES='[object:PLAN-ITEM-NOTES-1.text]' WHERE ID='[var:itemID]';" />
+						<else>
+							<assign property="datasource:write-warning.query" value="INSERT INTO WARNING (LABEL,TYPE,NOTES) values ('[object:PLAN-ITEM-LABEL-1.text]','[object:PLAN-ITEM-TYPE-1.text]','[object:PLAN-ITEM-NOTES-1.text]') " />
+						</else>
+					</if>
+				</sync>
+			</if>
+			<if lhs="[var:activeStep]" operator="e" rhs="2">
+				<sync>
+					<if lhs="[var:itemAction]" operator="e" rhs="edit">
+						<assign property="datasource:write-inspiration.query" value="UPDATE INSPIRATION SET LABEL='[object:PLAN-ITEM-LABEL-1.text]',TYPE='[object:PLAN-ITEM-TYPE-1.text]',NOTES='[object:PLAN-ITEM-NOTES-1.text]' WHERE ID='[var:itemID]';" />
+						<else>
+							<assign property="datasource:write-inspiration.query" value="INSERT INTO INSPIRATION (LABEL,TYPE,NOTES) values ('[object:PLAN-ITEM-LABEL-1.text]','[object:PLAN-ITEM-TYPE-1.text]','[object:PLAN-ITEM-NOTES-1.text]') " />
+						</else>
+					</if>
+				</sync>
+			</if>
+		</action>
+		<action name="saved-inspiration-complete" datasource="saved-inspiration" datasourceevent="querycomplete">
+			<assign property="var:inspirationCount" value="[datasource:saved-inspiration.dataSourceResultCount]" />
+			<if lhs="[var:dbAction]" operator="e" rhs="write">
+				<play action="close-plan-item"  />
+				<assign property="var:dbAction" value="" />
+			</if>
+		</action>
+		<action name="saved-warning-complete" datasource="saved-warning" datasourceevent="querycomplete">
+			<assign property="var:warningCount" value="[datasource:saved-warning.dataSourceResultCount]" />
+			<if lhs="[var:dbAction]" operator="e" rhs="write">
+				<play action="close-plan-item"  />
+				<assign property="var:dbAction" value="" />
+			</if>
+		</action>
+		<action name="close-plan-item" >
+			<alpha value="0" time=".3" target="PLAN-ITEM" />
+			<assign property="object:PLAN-ITEM-LABEL-1.text" value="" />
+			<assign property="object:PLAN-ITEM-TYPE-1.text" value="Type" />
+			<assign property="object:PLAN-ITEM-NOTES-1.text" value="" />
+			<keyboard visible="no" target="PLAN-ITEM-LABEL-1" />
+			<keyboard visible="no" target="PLAN-ITEM-TYPE-1" />
+			<keyboard visible="no" target="PLAN-ITEM-NOTES-1" />
+		</action>
+		
+		<action name="edit-item" > 
+			<assign property="var:itemAction" value="edit" />
+			<assign property="var:itemID" value="_id" />
+			<alpha value="1" time=".3" target="PLAN-ITEM" />
+			<assign property="object:PLAN-ITEM-LABEL-1.text" value="[datasource:saved-[eval: '[var:activeStep]' == '1' ? 'warning':'inspiration']._index.LABEL]" />
+			<assign property="object:PLAN-ITEM-TYPE-1.text" value="[datasource:saved-[eval: '[var:activeStep]' == '1' ? 'warning':'inspiration']._index.TYPE]" />
+			<assign property="object:PLAN-ITEM-NOTES-1.text" value="[datasource:saved-[eval: '[var:activeStep]' == '1' ? 'warning':'inspiration']._index.NOTES]" />
+		</action>
+		
+		<action name="remove-item" >
+			<assign property="var:itemID" value="_id" />
+			<alert subject="Are you sure?" message="Remove this item from your plan?" buttononetitle="No" buttontwotitle="Yes" buttontwoaction="remove-plan-item" />
+		</action>
+		
+		<action name="remove-plan-item" >
+			<if lhs="[var:activeStep]" operator="e" rhs="1">
+				<sync>
+					<assign property="datasource:write-warning.query" value="DELETE FROM WARNING WHERE ID = '[var:itemID]'" />
+				</sync>
+			</if>
+			<if lhs="[var:activeStep]" operator="e" rhs="2">
+				<sync>
+					<assign property="datasource:write-inspiration.query" value="DELETE FROM INSPIRATION WHERE ID = '[var:itemID]'" />
+				</sync>
+			</if>
+		</action>
+		
+		<action name="write-inspiration-complete" datasource="write-inspiration" datasourceevent="querycomplete">
+			<assign property="var:itemAction" value="" />
+			<if lhs="[var:sqlizer]" operator="ne" rhs="on">
+				<assign property="datasource:saved-inspiration.query" value="SELECT * FROM INSPIRATION ORDER BY ID DESC;" />
+			</if>
+		</action>
+		
+		<action name="write-warning-complete" datasource="write-warning" datasourceevent="querycomplete">
+			<assign property="var:itemAction" value="" />
+			<if lhs="[var:sqlizer]" operator="ne" rhs="on">
+				<assign property="datasource:saved-warning.query" value="SELECT * FROM WARNING ORDER BY ID DESC;" />
+			</if>
+		</action>
+		
+		<!-- !Contacts Actions -->
+		<action name="contacts-complete" datasource="contacts" datasourceevent="querycomplete">
+			<!-- 		<alert message="[datasource:contacts.dataSourceResultCount] // [datasource:contacts.0.content]" /> -->
+			<!-- 		<alert message="[datasource:contacts.14.firstname] // [datasource:contacts.14.lastname]" /> -->
+		</action>
+		<action name="add-contact">
+			<alpha value=".5" time=".3" target="CURTAIN" />
+			<alpha value="1" time=".3" target="CONTACTS" />
+		</action>
+		<action name="select-contact">
+			<alpha value="1" time=".3" target="CONTACT-INFO" />
+			<assign property="var:contactIndex" value="[object:name]" />
+<!--
+			<assign property="var:photo" value="[datasource:contacts.[object:name].image]" />
+			<assign property="var:name" value="[datasource:contacts.[object:name].firstname] [datasource:contacts.[object:name].lastname]" />
+			<alpha value="0" time=".3" target="CURTAIN" />
+			<alpha value="0" time=".3" target="CONTACTS" />
+			<create class="contact-item" contact-item="[var:contactCount]" contact-image="[var:photo]" name="[var:name]" description="test" target="CONTACT/contact-list" />
+			<assign property="var:contactCount" value="[eval: [var:contactCount] + 1]" />
+-->
+		</action>
+		
+		<action name="select-contact-type" >
+			<if lhs="[var:messageContact]" operator="e" rhs="yes">
+				<assign property="var:canContact" value="yes" />
+				<else>
+					<assign property="var:canContact" value="no" />
+				</else>
+			</if>
+			<assign property="var:contactType" value="[object:label.text]" />
+			<assign property="var:photo" value="[datasource:contacts.[var:contactIndex].image]" />
+			<assign property="var:name" value="[datasource:contacts.[var:contactIndex].firstname] [datasource:contacts.[var:contactIndex].lastname]" />
+			<alpha value="0" time=".3" target="CURTAIN" />
+			<alpha value="0" time=".3" target="CONTACTS" />
+			<alpha value="0" time=".3" target="CONTACT-INFO" />
+			<assign property="object:CONTACT-INFO/options/checkbox.background" value="ffffff" />
+			<assign property="var:messageContact" value="" />
+			<create class="contact-item" contact-item="[var:contactCount]" contact-image="[var:photo]" name="[var:name]" description="[var:contactType]" target="CONTACT/contact-list" canContact="[var:canContact]"/>
+			<assign property="var:contactCount" value="[eval: [var:contactCount] + 1]" />
+		</action>
+		
+		<action name="allow-message-contact" >
+			<assign property="object:background" value="126f93" />
+			<assign property="var:messageContact" value="yes" />
+		</action>
+		
+		<!-- !Environments Actions -->
+		<action name="add-environment-item" >
+			<alpha value="1" time=".3" target="ENVIRONMENT-ITEM" />
+		</action>
+		
+		<action name="close-environment-item" >
+			<alpha value="0" time=".3" target="ENVIRONMENT-ITEM" />
+			<assign property="object:ENVIRONMENT-LABEL-1.text" value="" />
+			<keyboard visible="no" target="ENVIRONMENT-LABEL-1" />
+		</action>
+		
+		<action name="save-environment-item">
+			<assign property="var:dbAction" value="write" />
+			<sync>
+				<if lhs="[var:itemAction]" operator="e" rhs="edit">
+					<assign property="datasource:write-environment.query" value="UPDATE ENVIRONMENT SET LABEL='[object:ENVIRONMENT-ITEM-LABEL-1.text]';" />
+					<else>
+						<assign property="datasource:write-environment.query" value="INSERT INTO ENVIRONMENT (LABEL) values ('[object:ENVIRONMENT-ITEM-LABEL-1.text]') " />
+						<alert message="object:ENVIRONMENT-ITEM-LABEL-1.text is [object:ENVIRONMENT-ITEM-LABEL-1.text]" />
+					</else>
+				</if>
+			</sync>
+		</action>
+		
+		<action name="edit-environment-item" > 
+			<assign property="var:itemAction" value="edit" />
+			<alert message="index is _index" />
+			<assign property="var:itemID" value="_id" />
+			<alpha value="1" time=".3" target="ENVIRONMENT-ITEM" />
+			<alert message="datasource:saved-environment._index.LABEL is [datasource:saved-environment._index.LABEL]" />
+			<assign property="object:ENVIRONMENT-ITEM-LABEL-1.text" value="[datasource:saved-environment._index.LABEL]" />
+		</action>
+		
+		<action name="remove-environment-item" >
+			<assign property="var:itemID" value="_id" />
+			<alert subject="Are you sure?" message="Remove this item from your plan?" buttononetitle="No" buttontwotitle="Yes" buttontwoaction="delete-environment-item" />
+		</action>
+		
+		<action name="delete-environment-item" >
+			<assign property="datasource:write-environment.query" value="DELETE FROM ENVIRONMENT WHERE ID = '[var:itemID]'" />
+		</action>
+		
+		<action name="write-environment-complete" datasource="write-environment" datasourceevent="querycomplete">
+			<assign property="var:itemAction" value="" />
+			<if lhs="[var:sqlizer]" operator="ne" rhs="on">
+				<assign property="datasource:saved-environment.query" value="SELECT * FROM ENVIRONMENT ORDER BY ID DESC;" />
+			</if>
+		</action>		
+		
+		<action name="saved-environment-complete" datasource="saved-environment" datasourceevent="querycomplete">
+			<assign property="var:environmentCount" value="[datasource:saved-environment.dataSourceResultCount]" />
+			<if lhs="[var:dbAction]" operator="e" rhs="write">
+				<play action="close-environment-item"  />
+				<assign property="var:dbAction" value="" />
+			</if>
+		</action>
+		
+		<!-- !Post Plan Actions -->
+		<action name="prep-inspiration-vars">
+			<if lhs="[var:inspirationCount]" operator="gt" rhs="0">
+				<assign property="var:inspirationIndex" value="1" />
+				<play action="iterate-inspiration-vars" />
+				<else>
+					<play action="prep-warning-vars" />
+				</else> 
+			</if>
+		</action>
+		<action name="iterate-inspiration-vars" >
+			<if lhs="[var:inspirationIndex]" operator="lte" rhs="[var:inspirationCount]">
+				<assign property="var:inspiration[var:inspirationIndex]-label" value="[datasource:saved-inspiration.[var:inspirationIndex].LABEL]" />
+				<assign property="var:inspiration[var:inspirationIndex]-type" value="[datasource:saved-inspiration.[var:inspirationIndex].TYPE]" />
+				<assign property="var:inspiration[var:inspirationIndex]-notes" value="[datasource:saved-inspiration.[var:inspirationIndex].NOTES]" />
+				<assign property="var:inspirationIndex" value="[eval: [var:inspirationIndex] + 1]" />
+				<play action="iterate-inspiration-vars" />
+				<else>
+					<play action="prep-warning-vars" />
+				</else>
+			</if>
+		</action>
+
+		<action name="prep-warning-vars">
+			<if lhs="[var:warningCount]" operator="gt" rhs="0">
+				<assign property="var:warningIndex" value="1" />
+				<play action="iterate-warning-vars" />
+				<else>
+					<play action="prep-environment-vars" />
+				</else> 
+			</if>
+		</action>
+		<action name="iterate-warning-vars" >
+			<if lhs="[var:warningIndex]" operator="lte" rhs="[var:warningCount]">
+				<assign property="var:warning[var:warningIndex]-label" value="[datasource:saved-warning.[var:warningIndex].LABEL]" />
+				<assign property="var:warning[var:warningIndex]-type" value="[datasource:saved-warning.[var:warningIndex].TYPE]" />
+				<assign property="var:warning[var:warningIndex]-notes" value="[datasource:saved-warning.[var:warningIndex].NOTES]" />
+				<assign property="var:warningIndex" value="[eval: [var:warningIndex] + 1]" />
+				<play action="iterate-warning-vars" />
+				<else>
+					<play action="prep-environment-vars" />
+				</else>
+			</if>
+		</action>
+
+		<action name="prep-environment-vars">
+			<if lhs="[var:environmentCount]" operator="gt" rhs="0">
+				<assign property="var:environmentIndex" value="1" />
+				<play action="iterate-environment-vars" />
+				<else>
+					<play action="prep-coping-vars" />
+				</else> 
+			</if>
+		</action>
+		<action name="iterate-environment-vars" >
+			<if lhs="[var:environmentIndex]" operator="lte" rhs="[var:environmentCount]">
+				<assign property="var:environment[var:environmentIndex]" value="[datasource:saved-environment.[var:environmentIndex].LABEL]" />
+				<assign property="var:environmentIndex" value="[eval: [var:environmentIndex] + 1]" />
+				<play action="iterate-environment-vars" />
+				<else>
+					<play action="prep-coping-vars" />
+				</else>
+			</if>
+		</action>
+
+		<action name="prep-coping-vars">
+			<if lhs="[var:copingCount]" operator="gt" rhs="0">
+				<assign property="var:copingIndex" value="1" />
+				<play action="iterate-coping-vars" />
+				<else>
+					<play action="post-plan" />
+				</else> 
+			</if>
+		</action>
+		<action name="iterate-coping-vars" >
+			<if lhs="[var:copingIndex]" operator="lte" rhs="[var:copingCount]">
+				<assign property="var:coping[var:copingIndex]-type" value="[datasource:saved-coping.[var:copingIndex].type]" />
+				<assign property="var:coping[var:copingIndex]-label" value="[datasource:saved-coping.[var:copingIndex].text]" />
+				<assign property="var:coping[var:copingIndex]-nodeID" value="[datasource:saved-coping.[var:copingIndex].nid]" />
+				<assign property="var:coping[var:copingIndex]-photo" value="[datasource:saved-coping.[var:copingIndex].photo]" />
+				<assign property="var:copingIndex" value="[eval: [var:copingIndex] + 1]" />
+				<play action="iterate-coping-vars" />
+				<else>
+					<play action="post-plan" />
+				</else>
+			</if>
+		</action>
+
+		<action name="post-plan" >
+			<if lhs="[var:userPlan]" operator="e" rhs="">
+				<assign property="var:postContent" value="[template:crudPlan.content]" />
+				<assign property="datasource:postPlan.postContent" value="[template:postBody.content]" />
+				<assign property="datasource:postPlan.source" value="https://samhsa.carewave.net/edm-mobile/rs/crud/plan/" />
+				<else>
+					<assign property="var:postContent" value="[template:crudPlanUpdate.content]" />
+					<assign property="datasource:planUpdate.postContent" value="[template:postBody.content]" />
+					<assign property="datasource:planUpdate.source" value="https://samhsa.carewave.net/edm-mobile/rs/crud/plan/[var:userPlan]" />
+				</else>
+			</if>
+		</action>
+
+		<action name="postPlan-complete" datasource="postPlan" datasourceevent="querycomplete">
+			<email subject="pre-submission and result" body="[template:postBody.content]\n\n\n\n\n\n\n[datasource:postPlan.0.content]" toaddress="mlong@rarewire.com" />
+			<alert message="postPlan-complete // datasource:postPlan.1.id is [datasource:postPlan.1.id] content is [datasource:postPlan.0.content]" />
+			<if lhs="[datasource:postPlan.1.id]" operator="ne" rhs="e">
+				<assign property="var:userPlan" value="[datasource:postPlan.1.id]" />
+			</if>
+	        <assign property="var:postContent" value="[template:crudUser.content]" />
+	        <assign property="datasource:userUpdate.postContent" value="[template:postBody.content]" />
+	        <assign property="datasource:userUpdate.source" value="https://samhsa.carewave.net/edm-mobile/rs/crud/profile/[var:userID]" />
+		</action>
+		
+		<action name="planUpdate-complete" datasource="planUpdate" datasourceevent="querycomplete">
+			<email subject="pre-submission and result" body="[template:postBody.content]\n\n\n\n\n\n\n[datasource:postPlan.0.content]" toaddress="mlong@rarewire.com" />
+			<alert message="planUpdate-complete // datasource:planUpdate.1.id is [datasource:planUpdate.1.id] content is [datasource:planUpdate.0.content]" />
+			<if lhs="[datasource:planUpdate.1.id]" operator="ne" rhs="e">
+				<assign property="var:userPlan" value="[datasource:planUpdate.1.id]" />
+			</if>
+	        <assign property="var:postContent" value="[template:crudUser.content]" />
+	        <assign property="datasource:userUpdate.postContent" value="[template:postBody.content]" />
+	        <assign property="datasource:userUpdate.source" value="https://samhsa.carewave.net/edm-mobile/rs/crud/profile/[var:userID]" />
+		</action>
+
+  </actions>
+</wire>

@@ -1,0 +1,18 @@
+{
+    "collection": "assessment",
+    "indices":
+        [
+            {
+                "keys":
+                    {
+                        "ref": 1
+                    },
+                "options" :
+                    {
+                        "background": true,
+                        "unique": true,
+                        "dropDups": true
+                    }
+            }
+        ]
+}

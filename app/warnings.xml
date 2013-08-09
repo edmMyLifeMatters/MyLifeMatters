@@ -1,0 +1,35 @@
+<entries>
+	<entry>
+		<text>Person/People</text>
+	</entry>
+	<entry>
+		<text>Location</text>
+	</entry>
+	<entry>
+		<text>Date</text>
+	</entry>
+	<entry>
+		<text>Event</text>
+	</entry>
+	<entry>
+		<text>Time</text>
+	</entry>
+	<entry>
+		<text>Situation</text>
+	</entry>
+	<entry>
+		<text>Activity</text>
+	</entry>
+	<entry>
+		<text>Words</text>
+	</entry>
+	<entry>
+		<text>Moods</text>
+	</entry>
+	<entry>
+		<text>Behavior</text>
+	</entry>
+	<entry>
+		<text>Other</text>
+	</entry>
+</entries>

@@ -1,0 +1,22 @@
+db.activity.find(
+	{
+		"profile":"51e0656f3004968c94506ec0", 
+		$and:
+			[
+				{
+		$or:
+			[ 
+				{"content":{$exists:true}},
+				{"media":{$exists:true}}
+			]
+				},
+				{
+		$or:
+			[ 
+				{"mood":{$exists:false}},
+				{"mood.level":{$gt:3}} 
+			] 
+				}
+			]
+	}
+);

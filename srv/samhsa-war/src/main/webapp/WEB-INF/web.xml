@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    MyLifeMatters
+    Copyright (c) 2013 by Netsmart Technologies, Inc.
+
+    This work is licensed under the Creative Commons Attribution 3.0 Unported License. 
+    To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/.
+    
+  -->
+  
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    
+    <display-name>MyLifeMatters Web Services</display-name>
+    
+    <context-param>
+        <param-name>mongo-jndi</param-name>
+        <param-value>mongodb/samhsa</param-value>
+    </context-param>
+    <context-param>
+        <param-name>mongo-db-name</param-name>
+        <param-value>--set-db-name-here--</param-value>
+    </context-param>
+    <context-param>
+        <param-name>mongo-id-style</param-name>
+        <param-value>id</param-value>
+    </context-param>
+    
+    <context-param>
+        <param-name>ua-key</param-name>
+        <param-value>--set-Urban-Airship-key-here--</param-value>
+    </context-param>
+    <context-param>
+        <param-name>ua-secret</param-name>
+        <param-value>--set-Urban-Airship-secret-here--</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>smtp-host</param-name>
+        <param-value>--set-smtp-host-here--</param-value>
+    </context-param>
+    <context-param>
+        <param-name>smtp-port</param-name>
+        <param-value>--set-smtp-port-here--</param-value>
+    </context-param>
+    <context-param>
+        <param-name>smtp-auth</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>smtp-tls</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>smtp-user</param-name>
+        <param-value>--set-smtp-username-here--</param-value>
+    </context-param>
+    <context-param>
+        <param-name>smtp-passwd</param-name>
+        <param-value>--set-smtp-passwd-here--</param-value>
+    </context-param>
+    <context-param>
+        <param-name>mail-name</param-name>
+        <param-value>MyLifeMatters</param-value>
+    </context-param>
+    <context-param>
+        <param-name>mail-from</param-name>
+        <param-value>--set-smtp-sender-name-here--</param-value>
+    </context-param>
+    
+        
+                
+    <listener>
+        <listener-class>org.everydaymatters.samhsa.srv.ApplicationContext</listener-class>
+    </listener>
+    
+    <filter>
+        <filter-class>org.everydaymatters.samhsa.rules.ActivityRuleFilter</filter-class>
+        <filter-name>ActivityRule</filter-name>
+        <init-param>
+            <param-name>methods</param-name>
+            <param-value>POST</param-value>
+        </init-param>
+    </filter>
+    
+    <filter>
+        <filter-class>org.everydaymatters.samhsa.rules.AssessmentRuleFilter</filter-class>
+        <filter-name>AssessmentRule</filter-name>
+        <init-param>
+            <param-name>methods</param-name>
+            <param-value>POST</param-value>
+        </init-param>
+    </filter>
+    
+    <filter-mapping>
+        <filter-name>ActivityRule</filter-name>
+        <url-pattern>/rs/crud/activity/</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>AssessmentRule</filter-name>
+        <url-pattern>/rs/crud/response</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+    
+    <servlet>
+        <servlet-name>ErrorServlet</servlet-name>
+        <servlet-class>org.everydaymatters.samhsa.web.JsonErrorServlet</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-class>org.everydaymatters.samhsa.srv.QueryServlet</servlet-class>
+        <servlet-name>Query</servlet-name>
+        <init-param>
+            <param-name>venti-secure</param-name>
+            <param-value>false</param-value>
+        </init-param>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>JerseyContainer</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>org.everydaymatters.samhsa.srv</param-value>
+        </init-param>
+    </servlet>
+    
+    <servlet>
+        <servlet-class>org.everydaymatters.venti.VentiVersionServlet</servlet-class>
+        <servlet-name>VentiVersion</servlet-name>
+    </servlet>
+    <servlet>
+        <servlet-class>org.everydaymatters.venti.VentiServlet</servlet-class>
+        <servlet-name>Venti</servlet-name>
+        <init-param>
+            <param-name>venti-secure</param-name>
+            <param-value>false</param-value>
+        </init-param>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>VentiVersion</servlet-name>
+        <url-pattern>/rs/crud/version</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Venti</servlet-name>
+        <url-pattern>/rs/crud/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>ErrorServlet</servlet-name>
+        <url-pattern>/error</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>Query</servlet-name>
+        <url-pattern>/rs/query/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>JerseyContainer</servlet-name>
+        <url-pattern>/rs/api/*</url-pattern>
+    </servlet-mapping>
+    
+    
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+    
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+    
+    <error-page><exception-type>java.lang.Throwable</exception-type><location>/error</location></error-page>
+    <error-page><error-code>400</error-code><location>/error</location></error-page>
+    <error-page><error-code>401</error-code><location>/error</location></error-page>
+    <error-page><error-code>402</error-code><location>/error</location></error-page>
+    <error-page><error-code>403</error-code><location>/error</location></error-page>
+    <error-page><error-code>404</error-code><location>/error</location></error-page>
+    <error-page><error-code>405</error-code><location>/error</location></error-page>
+    <error-page><error-code>406</error-code><location>/error</location></error-page>
+    <error-page><error-code>407</error-code><location>/error</location></error-page>
+    <error-page><error-code>408</error-code><location>/error</location></error-page>
+    <error-page><error-code>409</error-code><location>/error</location></error-page>
+    <error-page><error-code>500</error-code><location>/error</location></error-page>
+    <error-page><error-code>501</error-code><location>/error</location></error-page>
+    <error-page><error-code>502</error-code><location>/error</location></error-page>
+    <error-page><error-code>503</error-code><location>/error</location></error-page>
+    
+    <resource-ref>
+        <res-type>com.mongodb.MongoClient</res-type>
+        <res-ref-name>mongodb/samhsa</res-ref-name>
+    </resource-ref>
+    
+</web-app>

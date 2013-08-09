@@ -1,0 +1,66 @@
+{
+    "id": "51d321e28ae0d6cb305aa984",
+    "profile": "51d31a168ae0d6cb305aa983",
+    "created": "2013-07-03T13:48:10-0500",
+    "updated": "2013-07-04T13:48:10-0500",
+    "photos":
+        [
+            {
+                "label": "kids",
+                "notes": "We're counting on you!",
+                "media": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e"                
+            },
+            {
+                "label": "kittens",
+                "notes": "Kittens are soft and fuzzy.",
+                "media": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e"                
+            },
+            {
+                "label": "blue sky",
+                "notes": "Possibilities are endless.",
+                "media": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e"                
+            }
+        ],
+    "locations":
+        [
+            {
+                "label": "grandfather's house",
+                "notes": "Free-form user-entered notes about grandfather.",
+                "media": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e",                
+                "loc":
+                    {
+                        "lat": 38.92761,
+                        "lng": -94.642759
+                    }
+            }
+        ],
+    "quotes":
+        [
+            {
+                "text": "Every day matters.",
+                "link": "http://everydaymatters.org",
+                "media": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e"
+            }
+        ],
+    "articles":
+        [
+            {
+                "title": "Every day matters.",
+                "summary": "Successful people realize that every day maters, and so they...",
+                "link": "http://everydaymatters.org/blog/article-123-456",
+                "notes": "This really describes how I feel about my problems."
+            },
+            {
+                "title": "Every day matters.",
+                "summary": "Successful people realize that every day maters, and so they...",
+                "link": "http://everydaymatters.org/blog/article-123-456",
+                "notes": "This really describes how I feel about my problems."
+            }
+        ],
+    "driver":
+        {
+            "label": "kids",
+            "notes": "We're counting on you!",
+            "media": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e"                
+        }
+}

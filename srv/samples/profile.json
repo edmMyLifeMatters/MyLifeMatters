@@ -1,0 +1,64 @@
+{
+    "name": 
+        {
+            "first": "John",
+            "middle": "Q.",
+            "last": "Public",
+            "display": "Johnny Q."
+        },
+    "facebook":
+        {
+            "user": "johnnyq555",
+            "token": "abc123def456g789fed0bca",
+            "authenticated": "2013-07-04T13:48:10-0500"
+        },
+    "birth": "1950-12-24",
+    "email": "johnnyq555@gmail.com",
+    "phone": "816-555-1234",
+    "home":
+        {
+            "street":
+                [
+                    "4950 College Blvd"
+                ],
+            "city": "Overland Park",
+            "state": "KS",
+            "zip": "66211",
+            "loc":
+                {
+                    "lat": 38.92761,
+                    "lng": -94.642759
+                }
+        },
+    "genPrefs":
+        {
+            "appBackgroundImage": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e",
+            "arbitraryPrefAttributeName": "arbitraryPrefAttributeValue",
+            "anotherArbitraryPref": "anotherPrefValue"
+        },
+    "devices":
+        [
+            {
+                "name": "johnnyS3",
+                "model": "Galaxy S3",
+                "carrier": "ATT",
+                "pushId": "1234abcd",
+                "prefs":
+                    {
+                        "arbitraryDeviceSpecificPrefName": "prefValue",
+                        "anotherDevicePrefName": "anotherPrefValue"
+                    }
+            },
+            {
+                "name": "johnnyTab",
+                "model": "Galaxy Tab",
+                "carrier": "ATT",
+                "pushId": "5678efgb",
+                "prefs":
+                    {
+                        "arbitraryDeviceSpecificPrefName": "prefValue",
+                        "anotherDevicePrefName": "anotherPrefValue"
+                    }
+            }
+        ]
+}

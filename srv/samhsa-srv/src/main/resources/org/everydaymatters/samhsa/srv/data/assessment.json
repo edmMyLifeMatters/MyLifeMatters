@@ -1,0 +1,107 @@
+{
+    "collection": "assessment",
+    "ref": "ref",
+    "data":
+        [
+            {
+                "name": "PHQ-2", 
+                "ref": "phq2",
+                "title": "Personal Health Questionnaire",
+                "description": "This questionnaire assesses your current emotional health.",
+                "options":
+                    {
+                        "PHQ2yn":
+                            [
+                                { "code": "no", "value": 0, "text": "No", "state": "negated" },
+                                { "code": "yes", "value": 1, "text": "Yes", "state": "present" }
+                            ]
+                    },
+                "prompts":
+                    [
+                        {
+                            "code": "PHQ201",
+                            "concept": { "code": "404684003", "description": "loss of interest in activity" },
+                            "text": "Are you having little interest or pleasure in doing things?",
+                            "fact": "little interest or pleasure in doing things",
+                            "options": "PHQ2yn"
+                        },
+                        {
+                            "code": "PHQ202",
+                            "concept": { "code": "404684004", "description": "feeling despair" },
+                            "text": "Are you feeling down, depressed, or hopeless?",
+                            "fact": "feeling down, depressed or hopeless",
+                            "options": "PHQ2yn"
+                        }
+                    ]
+            },
+            {
+                "name": "Sleep Assessment", 
+                "ref": "sleep",
+                "title": "Rate Your Sleep",
+                "description": "This questionnaire assesses your sleep quality.",
+                "options":
+                    {
+                        "sleeptf":
+                            [
+                                { "code": "false", "value": 0, "text": "False", "state": "negated" },
+                                { "code": "true", "value": 1, "text": "True", "state": "present" }
+                            ]
+                    },
+                "prompts":
+                    [
+                        {
+                            "code": "sleep01",
+                            "concept": { "code": "230489007", "description": "excessive daytime sleepiness -- normal night sleep" },
+                            "text": "I feel sleepy during the day, even when I get a good night's sleep.",
+                            "fact": "excessive daytime sleepiness -- normal night sleep",
+                            "options": "sleeptf"
+                        },
+                        {
+                            "code": "sleep02",
+                            "text": "I get very irritable when I can't sleep.",
+                            "options": "sleeptf"
+                        },
+                        {
+                            "code": "sleep03",
+                            "text": "I often wake up at night and have trouble falling back to sleep.",
+                            "options": "sleeptf"
+                        },
+                        {
+                            "code": "sleep04",
+                            "text": "It usually takes me a long time to fall asleep.",
+                            "options": "sleeptf"
+                        },
+                        {
+                            "code": "sleep05",
+                            "text": "I often wake up very early and can't fall back to sleep.",
+                            "options": "sleeptf"
+                        },
+                        {
+                            "code": "sleep06",
+                            "text": "I usually feel achy and stiff when I wake up in the morning.",
+                            "options": "sleeptf"
+                        },
+                        {
+                            "code": "sleep07",
+                            "text": "I often seem to wake up because of dreams.",
+                            "options": "sleeptf"
+                        },
+                        {
+                            "code": "sleep08",
+                            "text": "I sometimes wake up gasping for breath.",
+                            "options": "sleeptf"
+                        },
+                        {
+                            "code": "sleep09",
+                            "text": "My bed partner says my snoring keeps her/him from sleeping.",
+                            "options": "sleeptf"
+                        },
+                        {
+                            "code": "sleep10",
+                            "text": "I've fallen asleep driving.",
+                            "options": "sleeptf"
+                        }
+                    ]
+            }
+        ]
+}

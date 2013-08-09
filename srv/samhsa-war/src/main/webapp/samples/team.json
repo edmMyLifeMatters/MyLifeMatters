@@ -1,0 +1,35 @@
+{
+    "id": "51d321e28ae0d6cb305aa984",
+    "profile": "51d31a168ae0d6cb305aa983",
+    "created": "2013-07-03T13:48:10-0500",
+    "updated": "2013-07-04T13:48:10-0500",
+    "members":
+        [
+            {
+                "name": 
+                    {
+                        "first": "John",
+                        "middle": "P.",
+                        "last": "Public",
+                        "display": "Dad"
+                    },
+                "email": "johnnyp555@gmail.com",
+                "phone": "816-555-1234",
+                "relationship": "Father",
+                "pic": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e"                
+            },
+            {
+                "name": 
+                    {
+                        "first": "Jane",
+                        "middle": "Q.",
+                        "last": "Public",
+                        "display": "Mom"
+                    },
+                "email": "janeq555@gmail.com",
+                "phone": "816-555-1234",
+                "relationship": "Mother",
+                "pic": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e"                
+            }
+        ]
+}

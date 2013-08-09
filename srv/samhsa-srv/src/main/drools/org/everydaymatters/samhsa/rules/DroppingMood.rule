@@ -1,0 +1,31 @@
+package org.everydaymatters.samhsa.rules;
+
+import java.util.Date;
+import java.util.Map;
+
+import org.everydaymatters.samhsa.srv.PushNotifier;
+
+declare Map
+    @role( event )
+end
+
+global org.everydaymatters.samhsa.rules.Responder responder;
+global java.util.Date now;
+
+rule "mood.drop"
+when
+    $profile: Map( this.get("docType")=="profile" )
+    accumulate( $m : Map( this.get("docType")=="activity", this.containsKey( "mood" )==true ) over window:length(3),
+                $moods : collectList( $m ) )
+    $oldest: Map( ((Number)this.get( "level" )).intValue() > 2 ) from ((Map) ((Map)$moods[0]).get( "mood" ))
+    $previous: Map( ((Number)this.get( "level" )).intValue() > 2 ) from ((Map) ((Map)$moods[1]).get( "mood" ))
+    $latest: Map( ((Number)this.get( "level" )).intValue() < 3 ) from ((Map) ((Map)$moods[2]).get( "mood" ))
+then
+    String profileId = $profile.get( "_id" ).toString();
+    responder.log( "Found profile: "+profileId+" with low latest mood "+$latest.get( "level" ) );
+//    responder.getNotifier()
+//             .sendNotification( profileId, 
+//                                "Don't forget MyLifeMatters!", 
+//                                "How are you doing? Please take a moment to update your mood journal.", 
+//                                PushNotifier.ACT_MOOD, PushNotifier.REF_NONE );
+end

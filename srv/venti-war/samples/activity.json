@@ -1,0 +1,18 @@
+{
+    "created": "2013-07-03T13:48:10-0500",
+    "updated": "2013-07-04T13:48:10-0500",
+    "profile": "51d31a168ae0d6cb305aa983",
+    "loc":
+        {
+            "lat": 38.92761,
+            "lng": -94.642759    
+        },
+    "mood":
+        {
+            "level": 5,
+            "description": "happy"
+        },
+    "content": "Content if activity from social feed, comment associated with mood, or journal entry.",
+    "source": "app_identifier_or_service_name",
+    "post": "SocialPostIdIfFromSocialFeed"
+}

@@ -1,0 +1,12 @@
+package org.everydaymatters.samhsa.rules;
+
+import java.util.Map;
+
+global org.everydaymatters.samhsa.rules.Responder responder;
+
+rule "activity.test"
+when
+    activity: Map( this.get("docType")=="activity" )
+then
+    responder.log( "Found activity for profile: "+activity.get("profile") );
+end

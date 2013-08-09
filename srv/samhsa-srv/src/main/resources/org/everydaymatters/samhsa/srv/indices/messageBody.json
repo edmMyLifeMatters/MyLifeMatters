@@ -1,0 +1,16 @@
+{
+    "collection": "messageBody",
+    "indices":
+        [
+            {
+                "keys":
+                    {
+                        "profile": 1
+                    },
+                "options" :
+                    {
+                        "background": true
+                    }
+            }                       
+        ]
+}

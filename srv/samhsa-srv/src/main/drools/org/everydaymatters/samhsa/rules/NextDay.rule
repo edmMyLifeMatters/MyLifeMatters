@@ -1,0 +1,26 @@
+package org.everydaymatters.samhsa.rules;
+
+import java.util.Date;
+import java.util.Map;
+
+import org.everydaymatters.samhsa.srv.PushNotifier;
+
+global org.everydaymatters.samhsa.rules.Responder responder;
+global java.util.Date now;
+
+rule "profile.dayOld"
+when
+    $profile: Map( this.get("docType")=="profile", ((Date)this.get("created")) before[ 23h, 25h ] now )
+    accumulate( Map( this.get("docType")=="activity", $dt: ((Date)this.get("created")) );
+                $max: max( $dt.getTime() );
+                $max before[ 6h ] now )
+then
+    String profileId = $profile.get( "_id" ).toString();
+    Date inactiveSince = new Date( $max.longValue() );
+    responder.log( "Found profile: "+profileId+" created on "+$profile.get("created")+" without activity update since "+inactiveSince );
+    responder.getNotifier()
+             .sendNotification( profileId, 
+                                "How are you doing?", 
+                                "How are you doing? Please take a moment to record how you're feeling.", 
+                                PushNotifier.ACT_ASSESS, PushNotifier.REF_ASSESS_PHQ2 );
+end

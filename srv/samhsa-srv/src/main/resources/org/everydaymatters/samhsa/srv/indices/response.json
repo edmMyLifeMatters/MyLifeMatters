@@ -1,0 +1,50 @@
+{
+    "collection": "response",
+    "indices":
+        [
+            {
+                "keys":
+                    {
+                        "profile": 1
+                    },
+                "options" :
+                    {
+                        "background": true
+                    }
+            },
+            {
+                "keys":
+                    {
+                        "profile": 1,
+                        "assessment": 1
+                    },
+                "options" :
+                    {
+                        "background": true
+                    }
+            },
+            {
+                "keys":
+                    {
+                        "profile": 1,
+                        "created": -1
+                    },
+                "options" :
+                    {
+                        "background": true
+                    }
+            },                       
+            {
+                "keys":
+                    {
+                        "profile": 1,
+                        "assessment": 1,
+                        "created": -1
+                    },
+                "options" :
+                    {
+                        "background": true
+                    }
+            }                       
+        ]
+}

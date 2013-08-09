@@ -1,0 +1,19 @@
+{
+    "collection": "profile",
+    "indices":
+        [
+            {
+                "keys":
+                    {
+                        "facebook.user": 1
+                    },
+                "options" :
+                    {
+                        "background": true,
+                        "sparse": true,
+                        "unique": false,
+                        "dropDups": true
+                    }
+            }
+        ]
+}

@@ -1,0 +1,12 @@
+package org.everydaymatters.samhsa.rules;
+
+import java.util.Map;
+
+global org.everydaymatters.samhsa.rules.Responder responder;
+
+rule "profile.test"
+when
+    profile: Map( this.get("docType")=="profile" )
+then
+    responder.log( "Found matching profile: "+profile.get("_id") );
+end

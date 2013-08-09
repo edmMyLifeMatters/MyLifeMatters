@@ -1,0 +1,20 @@
+{
+    "id": "51d328e93004e98d7fef1393",
+    "created": "2013-07-03T13:48:10-0500",
+    "updated": "2013-07-04T13:48:10-0500",
+    "profile": "51d31a168ae0d6cb305aa983",
+    "loc":
+        {
+            "lat": 38.92761,
+            "lng": -94.642759    
+        },
+    "mood":
+        {
+            "level": 5,
+            "description": "happy"
+        },
+    "content": "Content if activity from social feed, comment associated with mood, or journal entry.",
+    "media": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e",
+    "source": "app_identifier_or_service_name",
+    "post": "SocialPostIdIfFromSocialFeed"
+}

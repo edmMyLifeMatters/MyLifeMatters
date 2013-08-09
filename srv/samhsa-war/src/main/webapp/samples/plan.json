@@ -1,0 +1,72 @@
+{
+    "id": "51d321e28ae0d6cb305aa984",
+    "profile": "51d31a168ae0d6cb305aa983",
+    "created": "2013-07-03T13:48:10-0500",
+    "updated": "2013-07-04T13:48:10-0500",
+    "warnings":
+        [
+            {
+                "label": "drug cravings",
+                "type": "Other",
+                "notes": "Free-form user-entered notes about cravings.",
+                "loc":
+                    {
+                        "lat": 38.92761,
+                        "lng": -94.642759
+                    },
+                "media": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e"                
+            },
+            {
+                "label": "feeling anxious",
+                "type": "Mood",
+                "notes": "Free-form user-entered notes about anxiety.",
+                "loc":
+                    {
+                        "lat": 38.92761,
+                        "lng": -94.642759
+                    },
+                "media": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e"                
+            }
+        ],
+    "inspiration":
+        [
+            {
+                "label": "my grandfather",
+                "type": "Person",
+                "notes": "Free-form user-entered notes about grandfather.",
+                "loc":
+                    {
+                        "lat": 38.92761,
+                        "lng": -94.642759
+                    },
+                "media": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e"                
+            },
+            {
+                "label": "being outdoors",
+                "type": "Activity",
+                "notes": "Free-form user-entered notes about the outdoors.",
+                "loc":
+                    {
+                        "lat": 38.92761,
+                        "lng": -94.642759
+                    },
+                "media": "http://localhost:8080/api/rs/crud/blob/51d49fb730048aefbf66ce4e"                
+            }
+        ],
+    "techniques":
+        {
+            "physical":
+                [
+                    "Remove yourself from the situation",
+                    "Call positivie influencer"
+                ],
+            "mental":
+                [
+                    "Think happy thoughts"
+                ],
+            "spiritual":
+                [
+                    "Pray for peace"
+                ]
+        }
+}

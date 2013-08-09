@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+   Venti RESTful MongoDB 
+   Copyright (c) 2013 by Netsmart Technologies
+ 
+   Venti RESTful MongoDB is licensed under a
+   Creative Commons Attribution 3.0 Unported License.
+ 
+   You should have received a copy of the license along with this
+   work.  If not, see <http://creativecommons.org/licenses/by/3.0/>.
+
+ -->
+ 
+<Context antiJARLocking="true" path="/venti">
+  <Resource auth="Container" factory="com.mongodb.jndi.MongoClientJNDIFactory" mongoClientURI="mongodb://localhost:27017/venti?waitqueuemultiple=1500&amp;w=1&amp;maxpoolsize=40&amp;safe=true" name="mongodb/venti" type="com.mongodb.MongoClient"/>
+</Context>

@@ -1,0 +1,30 @@
+{
+    "collection": "edmUser",
+    "indices":
+        [
+            {
+                "keys":
+                    {
+                        "username": 1
+                    },
+                "options" :
+                    {
+                        "background": true,
+                        "unique": true,
+                        "dropDups": true
+                    }
+            },
+            {
+                "keys":
+                    {
+                        "profile": 1
+                    },
+                "options" :
+                    {
+                        "background": true,
+                        "unique": true,
+                        "dropDups": true
+                    }
+            }
+        ]
+}
